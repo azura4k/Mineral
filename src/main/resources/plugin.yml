@@ -1,0 +1,30 @@
+  name: Payroll
+  main: com.azura4k.mcpe.Payroll.PayrollBase
+  version: 1.0.0
+  api: 1.0.0
+  description: A nice plugin for economy servers where players can start business and host jobs.
+  author: Azura4k
+  depend:
+    - LlamaEconomy
+    - FormConstructor
+  commands:
+      manage:
+          description: Open GUI to create, delete, or manage a business.
+          usage: /manage
+          permission: Payroll.cmd
+      timesheet:
+          description:  Open GUI to clock in, clock out of work.
+          usage: /timesheet <business>
+          permission: Payroll.cmd
+      test:
+          description: Test
+          usage: /test <business>
+          permission: Payroll.cmd.admin
+      permissions:
+          payroll.cmd:
+              description: Ability to use basic Payroll commands
+              default: true
+          payroll.cmd.admin:
+              description: Ability to use admin Payroll commands
+              default: false
+

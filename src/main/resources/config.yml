@@ -1,0 +1,18 @@
+#Payroll by Azura4k
+#Requires LlamaEconomy and FormConstructor
+
+#Money required to start a business
+#This is required to subtract from a persons account.
+IntialStartupCost: 0
+
+#Payout Time, per minecraft days to pay an employee
+PaydayTime: 14
+
+#Minimum Wage an employer can have.
+MinimumWage: 10
+
+#Recipt Generation
+GenerateRecipt: true
+
+#Tax Percent
+TaxPercent : 0%

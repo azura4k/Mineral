@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="github" />
+      <option name="name" value="FormConstructor" />
+      <option name="url" value="https://maven.pkg.github.com/ContentForge/FormConstructor" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="localMvnRepo" />
+      <option name="name" value="localMvnRepo" />
+      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="localMvnRepo" />
+      <option name="name" value="localMvnRepo" />
+      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/FormConstructor.jar" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="nukkit-repo" />
+      <option name="name" value="nukkit-repo" />
+      <option name="url" value="https://repo.nukkitx.com/snapshot" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="lldv-repo" />
+      <option name="name" value="lldv-repo" />
+      <option name="url" value="http://system01.lldv.net:8082/artifactory/libs-snapshot" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="localMvnRepo" />
+      <option name="name" value="localMvnRepo" />
+      <option name="url" value="file://$PROJECT_DIR$/src/main/resources" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+  </component>
+</project>

@@ -17,10 +17,10 @@ public class SelectMenu {
     public void initialize(Player player){
         form.setTitle(PayRollAPI.getLanguage("SelectFormTitle"));
 
-        ArrayList<String> Employers = api.getEmployedBusinesses(player);
+        ArrayList<String> Employers = api.getBusinessesEmployedAt(player);
 
         for (int i = 0; i < Employers.size(); i++){
-            final String businessName = api.LoadBusinessFromID(Employers.get(i)).BusinessName;
+            final String businessName = api.LoadBusiness(Employers.get(i)).BusinessName;
             form.addButton(businessName, Handler);
 
         }

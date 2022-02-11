@@ -7,20 +7,20 @@ import ru.contentforge.formconstructor.form.ModalForm;
 
 public class DeleteBusiness {
     PayRollAPI api = new PayRollAPI();
-    ModalForm form = new ModalForm(PayRollAPI.getLanguage("DeleteBusineessFormTitle"));
+    ModalForm form = new ModalForm(PayRollAPI.getLanguage("DeleteBusinessFormTitle"));
 
     public void initialize(Player player, Business business){
 
-        form.setContent(PayRollAPI.getLanguage("DeleteBusineessFormConfirmationText" + business.BusinessName));
-        form.setPositiveButton(PayRollAPI.getLanguage("DeleteBusineessFormYesButton"));
-        form.setNegativeButton(PayRollAPI.getLanguage("DeleteBusineessFormNoButton"));
+        form.setContent(PayRollAPI.getLanguage("DeleteBusinessFormConfirmationText" + business.BusinessName));
+        form.setPositiveButton(PayRollAPI.getLanguage("DeleteBusinessFormYesButton"));
+        form.setNegativeButton(PayRollAPI.getLanguage("DeleteBusinessFormNoButton"));
 
         form.setHandler((p, result) -> {
             if (result){
                 api.DeleteBusiness(business, player);
             }
             else {
-                player.sendMessage("Deletion Averted");
+                player.sendMessage(PayRollAPI.getLanguage("DeleteBusinessFormAverted"));
             }});
         form.send(player);
     }

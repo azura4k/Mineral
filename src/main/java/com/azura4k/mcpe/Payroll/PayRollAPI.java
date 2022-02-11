@@ -6,7 +6,6 @@ import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
 import net.lldv.llamaeconomy.LlamaEconomy;
 
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -16,9 +15,6 @@ public class PayRollAPI{
     private static PayrollBase plugin;
 
     private static Config BusinessData;
-    private static Config UIDList;
-    private static Config Transactions;
-    private static Config EmployeeRegistry;
     public static Config PluginConfig;
 
 
@@ -26,19 +22,6 @@ public class PayRollAPI{
         instance.saveResource("/data/business.yml");
         BusinessData = new Config(instance.getDataFolder() + "/data/business.yml", Config.YAML);
         instance.getLogger().info("Business Data YAML Ready.");
-
-        instance.saveResource("/data/UIDList.yml");
-        UIDList = new Config(instance.getDataFolder() + "/data/UIDList.yml", Config.YAML);
-        instance.getLogger().info("UIDList Data YAML Ready.");
-
-        instance.saveResource("/data/Transactions.yml");
-        Transactions = new Config(instance.getDataFolder() + "/data/transactions.yml", Config.YAML);
-        instance.getLogger().info("Transactions Data YAML Ready.");
-
-        //Used to speed the process of obtaining business's up.
-        instance.saveResource("/data/EmployeeRegistry.yml");
-        EmployeeRegistry = new Config(instance.getDataFolder() + "/data/EmployeeRegistry.yml", Config.YAML);
-        instance.getLogger().info("Employee Registry Data YAML Ready.");
 
         PluginConfig = instance.getConfig();
 
@@ -48,93 +31,92 @@ public class PayRollAPI{
 
 
     public boolean CreateBusiness(String businessName, String businessDesc, Player owner) {
-        String uid = UIDGenerator();
-        Employee employee = new Employee();
 
         if (NameNotTook(businessName)) {
-            UIDList.set(businessName.toLowerCase(), uid);
-            BusinessData.set(uid + ".name", businessName);
-            BusinessData.set(uid + ".desc", businessDesc);
-            BusinessData.set(uid + ".ownerName", owner.getName());
-            BusinessData.set(uid + ".creationdate", getDate());
-            BusinessData.set(uid + ".balance", (double) 0);
-            BusinessData.set(uid + ".trustedrank", 4);
-            BusinessData.set(uid + ".maxrank", 5);
-            BusinessData.set(uid + ".minrank", 1);
+            BusinessData.set(businessName + ".name", businessName);
+            BusinessData.set(businessName + ".desc", businessDesc);
+            BusinessData.set(businessName + ".ownerName", owner.getName());
+            BusinessData.set(businessName + ".creationdate", getDate());
+            BusinessData.set(businessName + ".balance", (double) 0);
+            BusinessData.set(businessName + ".trustedrank", 4);
+            BusinessData.set(businessName + ".maxrank", 5);
+            BusinessData.set(businessName + ".minrank", 1);
             BusinessData.save();
-            UIDList.save();
+            BusinessData.reload();
 
             //Load Owner as Employee
-            HireEmployee(uid, owner, "Founder", 20, 5, 10);
+            HireEmployee(businessName, owner, "Founder", 20, 5, 10);
 
             return true;
         }
         return false;
     }
-    public boolean DeleteBusiness(Business business, Player commandeer) {
+    public void DeleteBusiness(Business business, Player commandeer) {
         try {
             if (commandeer == business.Owner || commandeer.isOp()) {
-                BusinessData.remove(business.UID);
-                UIDList.remove(business.BusinessName.toLowerCase());
+                BusinessData.remove(business.BusinessName);
                 BusinessData.save();
-                UIDList.save();
-                EmployeeRegistry.getKeys().remove(business.UID);
-                return true;
-            } else {
-                return false;
+                BusinessData.reload();
             }
-        } catch (Exception e){
-           return false;
+        } catch (Exception ignored){
         }
     }
     public static void SaveNewBusinessData(Business business) {
-        BusinessData.set(business.UID  + ".desc", business.BusinessDesc);
-        BusinessData.set(business.UID  + ".ownerName", business.Owner.getName());
-        BusinessData.set(business.UID  + ".balance", business.Balance);
-        BusinessData.set(business.UID  + ".trustedrank", business.TrustedRank);
-        BusinessData.set(business.UID  + ".maxrank", business.MaxRank);
-        BusinessData.set(business.UID  + ".minrank", business.MinRank);
+        BusinessData.reload();
+        BusinessData.set(business.BusinessName  + ".desc", business.BusinessDesc);
+        BusinessData.set(business.BusinessName  + ".ownerName", business.Owner.getName());
+        BusinessData.set(business.BusinessName  + ".balance", business.Balance);
+        BusinessData.set(business.BusinessName  + ".trustedrank", business.TrustedRank);
+        BusinessData.set(business.BusinessName  + ".maxrank", business.MaxRank);
+        BusinessData.set(business.BusinessName  + ".minrank", business.MinRank);
         BusinessData.save();
         BusinessData.reload();
     }
     public Business LoadBusiness(String businessName){
         Business business = new Business();
-        if (UIDList.exists(businessName.toLowerCase())){
-            business.UID = UIDList.get(businessName.toLowerCase()).toString();
-            business.BusinessName = BusinessData.get(business.UID + ".name").toString();
-            business.BusinessDesc = BusinessData.get(business.UID + ".desc").toString();
-            business.CreationDate = BusinessData.get(business.UID + ".creationdate").toString();
-            business.Owner = plugin.getServer().getPlayerExact(BusinessData.get(business.UID + ".ownerName").toString());
-            business.Balance = (double) BusinessData.get(business.UID + ".balance");
-            business.TrustedRank = (int) BusinessData.get(business.UID + ".trustedrank");
-            business.MaxRank = (int) BusinessData.get(business.UID + ".maxrank");
-            business.MinRank = (int) BusinessData.get(business.UID + ".minrank");
+        if (BusinessData.exists(businessName, true)){
+            business.BusinessName = BusinessData.get(businessName + ".name").toString();
+            business.BusinessDesc = BusinessData.get(businessName + ".desc").toString();
+            business.CreationDate = BusinessData.get(businessName + ".creationdate").toString();
+            business.Owner = plugin.getServer().getPlayerExact(BusinessData.get(businessName + ".ownerName").toString());
+            business.Balance = (double) BusinessData.get(businessName + ".balance");
+            business.TrustedRank = (int) BusinessData.get(businessName + ".trustedrank");
+            business.MaxRank = (int) BusinessData.get(businessName + ".maxrank");
+            business.MinRank = (int) BusinessData.get(businessName + ".minrank");
+
+
+            Set<String> Employees = BusinessData.getSection(businessName + ".employees").getKeys(false);
+
+            for (String EmployeeName: Employees) {
+                String key = businessName + ".employees." + EmployeeName.toLowerCase();
+                Employee employee = new Employee();
+                employee.EmployerName = business.BusinessName;
+                employee.playerUUID = UUID.fromString(BusinessData.getString(key + ".PlayerUUID"));
+                employee.PlayerName = BusinessData.getString(key + ".PlayerName");
+                employee.StartDate = BusinessData.getString(key +".StartDate");
+                employee.Title = BusinessData.getString(key + ".Title");
+                employee.MaximumHours = BusinessData.getDouble(key + ".MaxHrs");
+                employee.Rank = BusinessData.getInt(key + ".Rank");
+                employee.Wage = BusinessData.getDouble(key + ".Wage");
+                employee.Fired = BusinessData.getBoolean(key + ".Fired");
+                employee.FiredDate = BusinessData.getString(key + ".FiredDate");
+                employee.HoursWorkedPerPayPeriod = BusinessData.getDouble(key + ".HoursWorked");
+                employee.TotalWorkHours = BusinessData.getDouble(key + ".TotalHoursWorked");
+                business.Employees.add(employee);
+            }
             return business;
         }
         else {
-            return business = null;
+            return null;
         }
     }
-    public Business LoadBusinessFromID(String EmployerID){
-        Business business = new Business();
-            business.UID = EmployerID;
-            business.BusinessName = BusinessData.get(business.UID + ".name").toString();
-            business.BusinessDesc = BusinessData.get(business.UID + ".desc").toString();
-            business.CreationDate = BusinessData.get(business.UID + ".creationdate").toString();
-            business.Owner = plugin.getServer().getPlayerExact(BusinessData.get(business.UID + ".ownerName").toString());
-            business.Balance = (double) BusinessData.get(business.UID + ".balance");
-            business.TrustedRank = (int) BusinessData.get(business.UID + ".trustedrank");
-            business.MaxRank = (int) BusinessData.get(business.UID + ".maxrank");
-            business.MinRank = (int) BusinessData.get(business.UID + ".minrank");
-            return business;
-    }
 
-    public boolean HireEmployee(String employerID, Player player, String title, double MaxHours, int rank, double wage){
+
+    public boolean HireEmployee(String businessName, Player player, String title, double MaxHours, int rank, double wage){
         //If business data does not exist
-        String key = employerID + ".employees." + player.getName().toLowerCase();
-        String key2 = player.getUniqueId().toString() + "." + employerID;
+        String key = businessName + ".employees." + player.getName().toLowerCase();
         if (!BusinessData.exists(key, true)){
-            BusinessData.set( key + ".PlayerUid", player.getUniqueId().toString());
+            BusinessData.set( key + ".PlayerUUID", player.getUniqueId().toString());
             BusinessData.set(key + ".StartDate", getDate());
             BusinessData.set(key + ".Title", title);
             BusinessData.set(key + ".PlayerName", player.getName());
@@ -143,21 +125,32 @@ public class PayRollAPI{
             BusinessData.set(key + ".Wage", wage);
             BusinessData.set(key + ".Fired", false);
             BusinessData.set(key + ".FiredDate", "null");
+            BusinessData.set(key + ".HoursWorked", 0.0);
+            BusinessData.set(key + ".TotalHoursWorked", 0.0);
             BusinessData.save();
-
-            EmployeeRegistry.set(key2 + ".HoursWorked", 0.0);
-            EmployeeRegistry.save();
+            return true;
+        }
+        return false;
+    }
+    public boolean FireEmployee(Employee employee){
+        String key = employee.EmployerName + ".employees." + employee.PlayerName;
+        if (BusinessData.exists(key, true)){
+            BusinessData.reload();
+            BusinessData.set(key + ".Fired", true);
+            BusinessData.set(key + ".FiredDate", getDate());
+            BusinessData.save();
+            BusinessData.reload();
             return true;
         }
         return false;
     }
     public Employee LoadEmployee(Business business, String EmployeeName){
-        String key = business.UID + ".employees." + EmployeeName.toLowerCase();
+        String key = business.BusinessName + ".employees." + EmployeeName.toLowerCase();
         Employee employee = new Employee();
         //Check for Employment
         if (BusinessData.exists(key, true)){
-            employee.EmployerUID = business.UID;
-            employee.playerUUID = UUID.fromString(BusinessData.getString(key+ ".PlayerUid"));
+            employee.EmployerName = business.BusinessName;
+            employee.playerUUID = UUID.fromString(BusinessData.getString(key+ ".PlayerUUID"));
             employee.PlayerName = BusinessData.getString(key+ ".PlayerName");
             employee.StartDate = BusinessData.getString(key +".StartDate");
             employee.Title = BusinessData.getString(key + ".Title");
@@ -166,56 +159,65 @@ public class PayRollAPI{
             employee.Wage = BusinessData.getDouble(key + ".Wage");
             employee.Fired = BusinessData.getBoolean(key + ".Fired");
             employee.FiredDate = BusinessData.getString(key + ".FiredDate");
+            employee.HoursWorkedPerPayPeriod = BusinessData.getDouble(key + ".HoursWorked");
+            employee.TotalWorkHours = BusinessData.getDouble(key + ".TotalHoursWorked");
             return employee;
         }
         return employee = null;
     }
-    public boolean FireEmployee(Employee employee){
-        String key = employee.EmployerUID + ".employees." + employee.PlayerName;
-        String key2 = employee.playerUUID.toString() + "." + employee.EmployerUID;
-        if (BusinessData.exists(key, true)){
+    public static void SaveNewEmployeeData(Employee employee) {
+        String key = employee.EmployerName + ".employees." + employee.PlayerName;
+        if (!BusinessData.exists(key, true)){
             BusinessData.reload();
-            BusinessData.set(key + ".Fired", true);
-            BusinessData.set(key + ".FiredDate", getDate());
+            BusinessData.set(key + ".Title", employee.Title);
+            BusinessData.set(key + ".MaxHrs", employee.MaximumHours);
+            BusinessData.set(key+ ".Rank", employee.Rank);
+            BusinessData.set(key + ".Wage", employee.Wage);
+            BusinessData.set(key + ".Fired", employee.Fired);
+            BusinessData.set(key + ".FiredDate", employee.FiredDate);
+            BusinessData.set(key + ".HoursWorked",employee.HoursWorkedPerPayPeriod);
+            BusinessData.set(key + ".TotalHoursWorked", employee.TotalWorkHours);
             BusinessData.save();
             BusinessData.reload();
-
-            EmployeeRegistry.reload();
-            EmployeeRegistry.remove(key2);
-            PayEmployeeHourlyRate(employee);
-            EmployeeRegistry.save();
-            EmployeeRegistry.reload();
-
-            return true;
         }
-        return false;
     }
-    public ArrayList<String> getEmployedBusinesses(Player player){
-        ArrayList<String> EmployerIDs = new ArrayList<>();
 
-        //Had to get the Set loaded into an Array, due iteration purposes.
-        for (Iterator<String> Key = EmployeeRegistry.getSection(player.getUniqueId().toString()).getKeys(false).iterator(); Key.hasNext();){
-            EmployerIDs.add(Key.next());
+    public ArrayList<String> getBusinessesEmployedAt(Player player){
+
+        ArrayList<String> EmployedBusinesses = new ArrayList<>();
+        BusinessData.reload();
+        Iterator EachBusiness = BusinessData.getKeys(false).iterator();
+        while (EachBusiness.hasNext()){
+            String BusinessName = EachBusiness.next().toString();
+            Business business = LoadBusiness(BusinessName);
+            for (int i = 0; i < business.Employees.size(); i++) {
+                if (Objects.equals(business.Employees.get(i).playerUUID, player.getUniqueId())){
+                    EmployedBusinesses.add(BusinessName);
+                }
+            }
         }
-        return EmployerIDs;
+        return EmployedBusinesses;
     }
+
+
+
 
     public void PayEmployeeHourlyRate(Employee employee){
-        String key = employee.playerUUID.toString() + "." + employee.EmployerUID;
-        Double TimeWorked = EmployeeRegistry.getDouble(key + ".HoursWorked");
+        Double TimeWorked = employee.HoursWorkedPerPayPeriod;
         Double Tax;
-        Tax = 0.0;
+        Tax = plugin.getConfig().getDouble("TaxPercent");
         Double Income = TimeWorked * employee.Wage;
         Double TaxSubtraction = Income * Tax;
 
         LlamaEconomy.getAPI().addMoney(employee.playerUUID, Income - TaxSubtraction);
 
-        Business Employer = LoadBusinessFromID(employee.EmployerUID);
+        Business Employer = LoadBusiness(employee.EmployerName);
         Employer.Balance -= Income - TaxSubtraction;
         Employer.SaveData();
     }
     
     //Utilities
+    //Useful for Transactions Later
     public static String UIDGenerator(){
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
@@ -228,7 +230,7 @@ public class PayRollAPI{
     }
 
     public static boolean NameNotTook(String Name){
-       if (!UIDList.exists(Name.toLowerCase(),true)) {
+       if (!BusinessData.exists(Name.toLowerCase(),true)) {
            if (Name.length() > 0){
                return true;
            }
@@ -238,24 +240,6 @@ public class PayRollAPI{
            return false;
        }
     }
-
-    public static boolean RenameBusiness(String OldName, String NewName){
-        if(NameNotTook(NewName)){
-            String UID = UIDList.getString(OldName.toLowerCase());
-            BusinessData.set(UID + ".name", NewName);
-            BusinessData.save();
-            BusinessData.reload();
-            UIDList.set(NewName.toLowerCase(), UID);
-            UIDList.remove(OldName.toLowerCase());
-            UIDList.save();
-            UIDList.reload();
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
 
     public static String getLanguage(String LanugageTag){
         return PluginConfig.getString("Language." + LanugageTag);

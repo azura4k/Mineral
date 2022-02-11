@@ -23,7 +23,7 @@ public class Options {
         };
         SimpleFormHandler Treasury = (p, button) ->{
             Treasury form = new Treasury();
-            form.initialize(p, business);
+            form.initialize(p, business, api.LoadEmployee(business, player.getName()));
         };
 
         SimpleFormHandler EmployeeInfo = (p, button) ->{
@@ -75,7 +75,6 @@ public class Options {
             Options.addButton(fire_employee, FireEmployees);
             Options.addButton(transactions, Transactions);
             Options.addButton(transfer_ownership, TransferOwner);
-            Options.addButton(quit_job, QuitJob);
             Options.addButton(delete_business, DeleteBusiness);
 
         }

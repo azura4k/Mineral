@@ -8,7 +8,6 @@ import com.azura4k.mcpe.Payroll.Models.Employee;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
 
 import java.util.List;
-import java.util.Set;
 
 public class TestCmd extends Command {
     public TestCmd() {
@@ -20,6 +19,7 @@ public class TestCmd extends Command {
         PayRollAPI api = new PayRollAPI();
         Player player = commandSender.getServer().getPlayerExact(commandSender.getName());
         String Args = strings[0];
+        String Args2 = strings[1];
         //api.CreateBusiness("testingBusiness", "Testing", player);
 
         //Business business = api.LoadBusiness("testingBusiness");
@@ -37,9 +37,9 @@ public class TestCmd extends Command {
         //commandSender.getServer().getLogger().info(business.BusinessName);
         //commandSender.getServer().getLogger().info(employee.player.getName());
         //commandSender.getServer().getLogger().info(String.valueOf(business.Balance));
-
-        List Businesses = api.getEmployedBusinesses(player);
-        commandSender.getServer().getLogger().info(Businesses.toString());
+        Business business = api.LoadBusiness(Args);
+        Employee employee = api.LoadEmployee(business, Args2);
+        commandSender.getServer().getLogger().info(employee.playerUUID.toString());
         return true;
     }
 }

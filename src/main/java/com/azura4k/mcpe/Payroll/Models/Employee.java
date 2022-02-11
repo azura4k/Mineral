@@ -11,8 +11,6 @@ public class Employee {
     public UUID playerUUID;
     public String EmployerUID;
 
-
-
     public String StartDate;
     public String PlayerName;
     public String Title;
@@ -28,7 +26,7 @@ public class Employee {
 
 
     public void SaveData(){
-       // PayRollAPI.SaveNewEmployeeData(this);
+       //PayRollAPI.SaveNewEmployeeData(this);
     }
 
     //Utilites

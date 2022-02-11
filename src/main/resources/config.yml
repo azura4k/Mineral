@@ -16,3 +16,87 @@ GenerateRecipt: true
 
 #Tax Percent
 TaxPercent : 0%
+
+
+#Here is all the Language Stuff
+Language:
+
+#Main Selection/Create Business Form - Starts with /Manage
+  SelectFormTitle: "Select A Business"
+  CreateBusinessButton: "Create Business"
+
+#Create Business Form
+  CreateBusinessFormTitle: "Create A New Business"
+  CreateBusinessFormNameLabel: "Business Name"
+  CreateBusinessFormDescriptionLabel: "Business Description"
+    #Startup Cost will always be at the end
+  CreateBusinessFormStartupCost: "Intial Cost: "
+
+#Manage Business Info Form
+  ManageBusinessInfoFormTitle: "Manage Business - Change Details"
+  ManageBusinessInfoFormBusinessName: "Business Name"
+  ManageBusinessInfoFormDesc: "Business Description"
+  ManageBusinessInfoFormMaxRank: "Max Rank"
+  ManageBusinessInfoFormMin: "Min Rank"
+  ManageBusinessInfoFormTrustedRank: "Trusted Rank - Rank where players can Hire, Fire, and Manage Bank"
+  ManageBusinessInfoFormUUID: "Your Business's UID: "
+
+  #Note, Balance will be at the end
+  ManageBusinessInfoFormBalance: "Current Business Bank Balance is: "
+  ManageBusinessInfoFormTrustedRankBelowOwner: "Current Trusted Rank: "
+  ManageBusinessInfoFormNameBelowOwner: "Business Name: "
+  ManageBusinessInfoFormQuitText: "To quit your job, type the following below 'I QUIT'."
+  ManageBusinessInfoFormQuitTextConfirm: "I QUIT"
+
+#Delete Business Form
+  DeleteBusineessFormTitle: "Confirmation"
+  #Business Name is at the end
+  DeleteBusineessFormConfirmationText: "Are you sure you wish to delete the following business. Once done, it cannot be reversed. Following Business Name is "
+  DeleteBusineessFormYesButton: "Yes"
+  DeleteBusineessFormNoButton: "No"
+
+#Quit Job Form
+  QuitJobFormTitle: "Confirmation"
+  QuitJobFormContent: "Are you sure you want to quit? You will be leaving your position at: "
+  QuitJobFormYesButton: "Yes"
+  QuitJobFormNoButton: "No"
+
+#Options Form
+  OptionsFormBusinessInfoButton: "Business Info"
+  OptionsFormTreasuryButton: "Treasury"
+  OptionsFormEmployeeInfo: "Employee Info"
+  OptionsFormHireEmployees: "Hire Employees"
+  OptionsFormFireEmployees: "Fire Employees"
+  OptionsFormTransactions: "Transactions"
+  OptionsFormTransferOwner: "Transfer Owner"
+  OptionsFormQuitJob: "Quit Job"
+  OptionsFormDeleteBusiness: "Delete Business"
+
+
+
+#Bank Options Form
+  BankOptionsFormTitle: "Treasury"
+  BankOptionsFormBalanceText: "Current Balance Is: "
+  BankOptionsFormDepositButton: "Deposit"
+  BankOptionsFormWithdrawButton: "Withdraw"
+
+#Deposit Form
+  DepositFormTitle: "Deposit Money"
+  DepositFormEnterAmount: "Please Enter the Amount of Money"
+  DepositFormCurrentBalance: "Current Balance is: "
+  DepositFormButton: "Deposit Money"
+  #Amount comes after
+  DepositFormSuccesful: "Successfully Deposited: "
+
+#Withdraw Form
+  WithdrawFormTitle: "Withdraw Money"
+  WithdrawFormEnterAmount: "Please Enter the Amount of Money"
+  WithdrawFormCurrentBalance: "Current Balance is: "
+  WithdrawFormButton: "Withdraw Money"
+  WithdrawFormSuccesful: "Successfully Withdrawn: "
+
+# Errors and Codes
+  SuccessfulRename: "Business Renamed Successfully"
+  BusinessNameAlrRegistered: "Business Name is Already Taken"
+  OverDraftRisk: "Not Enough Money On Player"
+  BusinessOverdraftRisk: "Not Enough Money In Business"

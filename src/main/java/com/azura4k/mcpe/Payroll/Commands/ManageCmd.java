@@ -3,7 +3,7 @@ package com.azura4k.mcpe.Payroll.Commands;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.BusinessSelectOrCreate;
+import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.SelectMenu;
 
 public class ManageCmd extends Command {
     public ManageCmd() {
@@ -15,7 +15,7 @@ public class ManageCmd extends Command {
 
         Player player = commandSender.getServer().getPlayerExact(commandSender.getName());
         commandSender.getServer().getLogger().info("CommandSuccessful");
-        BusinessSelectOrCreate form = new BusinessSelectOrCreate();
+        SelectMenu form = new SelectMenu();
         form.initialize(player);
 
 

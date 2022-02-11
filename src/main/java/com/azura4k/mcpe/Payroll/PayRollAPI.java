@@ -71,13 +71,14 @@ public class PayRollAPI{
         }
         return false;
     }
-    public boolean DeleteBusiness(Business business, Player commandsender) {
+    public boolean DeleteBusiness(Business business, Player commandeer) {
         try {
-            if (commandsender == business.Owner || commandsender.isOp()) {
+            if (commandeer == business.Owner || commandeer.isOp()) {
                 BusinessData.remove(business.UID);
                 UIDList.remove(business.BusinessName.toLowerCase());
                 BusinessData.save();
                 UIDList.save();
+                EmployeeRegistry.getKeys().remove(business.UID);
                 return true;
             } else {
                 return false;
@@ -94,6 +95,7 @@ public class PayRollAPI{
         BusinessData.set(business.UID  + ".maxrank", business.MaxRank);
         BusinessData.set(business.UID  + ".minrank", business.MinRank);
         BusinessData.save();
+        BusinessData.reload();
     }
     public Business LoadBusiness(String businessName){
         Business business = new Business();
@@ -239,14 +241,23 @@ public class PayRollAPI{
 
     public static boolean RenameBusiness(String OldName, String NewName){
         if(NameNotTook(NewName)){
-            String UID = UIDList.get(OldName).toString().toLowerCase();
+            String UID = UIDList.getString(OldName.toLowerCase());
             BusinessData.set(UID + ".name", NewName);
-            UIDList.set(NewName, UID);
-            UIDList.remove(OldName);
+            BusinessData.save();
+            BusinessData.reload();
+            UIDList.set(NewName.toLowerCase(), UID);
+            UIDList.remove(OldName.toLowerCase());
+            UIDList.save();
+            UIDList.reload();
             return true;
         }
         else {
             return false;
         }
+    }
+
+
+    public static String getLanguage(String LanugageTag){
+        return PluginConfig.getString("Language." + LanugageTag);
     }
 }

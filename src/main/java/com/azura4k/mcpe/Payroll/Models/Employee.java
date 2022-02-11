@@ -23,8 +23,6 @@ public class Employee {
     public boolean Fired;
     public String FiredDate;
 
-    PayRollAPI api = new PayRollAPI();
-
 
     public void SaveData(){
        PayRollAPI.SaveNewEmployeeData(this);

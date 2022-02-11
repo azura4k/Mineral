@@ -11,18 +11,18 @@ public class Withdraw {
     PayRollAPI api = new PayRollAPI();
     CustomForm form = new CustomForm(PayRollAPI.getLanguage("DepositFormTitle"));
 
-    public void initialize(Player player, Business business){
+    public void initialize(Player player, Business business, Employee employee){
 
         form.addElement(PayRollAPI.getLanguage("WithdrawFormCurrentBalance") + business.Balance);
         form.addElement("Amount" , Input.builder().setName(PayRollAPI.getLanguage("WithdrawFormEnterAmount")).build());
         form.setHandler((p, response) -> {
             Double Amount = Double.valueOf(response.getInput("Amount").getValue());
-            Employee employee = api.LoadEmployee(business, player.getName());
+
             if (business.Withdraw(employee, Amount)){
                 p.sendMessage(PayRollAPI.getLanguage("WithdrawFormSuccesful") + Amount);
             }
             else{
-                p.sendMessage(PayRollAPI.getLanguage("OverDraftRisk"));
+                p.sendMessage(PayRollAPI.getLanguage("BusinessOverdraftRisk"));
             }
         });
         form.send(player);

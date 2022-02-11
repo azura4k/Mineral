@@ -15,7 +15,7 @@ MinimumWage: 10
 GenerateRecipt: true
 
 #Tax Percent
-TaxPercent : 0%
+TaxPercent : 0.0
 
 
 #Here is all the Language Stuff
@@ -49,11 +49,12 @@ Language:
   ManageBusinessInfoFormQuitTextConfirm: "I QUIT"
 
 #Delete Business Form
-  DeleteBusineessFormTitle: "Confirmation"
+  DeleteBusinessFormTitle: "Confirmation"
   #Business Name is at the end
-  DeleteBusineessFormConfirmationText: "Are you sure you wish to delete the following business. Once done, it cannot be reversed. Following Business Name is "
-  DeleteBusineessFormYesButton: "Yes"
-  DeleteBusineessFormNoButton: "No"
+  DeleteBusinessFormConfirmationText: "Are you sure you wish to delete the following business? Once done, it cannot be reversed. Following Business Name is "
+  DeleteBusinessFormYesButton: "Yes"
+  DeleteBusinessFormNoButton: "No"
+  DeleteBusinessFormAverted: "Deletion Averted"
 
 #Quit Job Form
   QuitJobFormTitle: "Confirmation"
@@ -71,8 +72,6 @@ Language:
   OptionsFormTransferOwner: "Transfer Owner"
   OptionsFormQuitJob: "Quit Job"
   OptionsFormDeleteBusiness: "Delete Business"
-
-
 
 #Bank Options Form
   BankOptionsFormTitle: "Treasury"
@@ -96,7 +95,7 @@ Language:
   WithdrawFormSuccesful: "Successfully Withdrawn: "
 
 # Errors and Codes
-  SuccessfulRename: "Business Renamed Successfully"
   BusinessNameAlrRegistered: "Business Name is Already Taken"
   OverDraftRisk: "Not Enough Money On Player"
   BusinessOverdraftRisk: "Not Enough Money In Business"
+  SuccessfullyUpdated: "Information Successfully Updated"

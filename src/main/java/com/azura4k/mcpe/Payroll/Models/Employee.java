@@ -9,7 +9,7 @@ public class Employee {
 
     //Loaded later with load
     public UUID playerUUID;
-    public String EmployerUID;
+    public String EmployerName;
 
     public String StartDate;
     public String PlayerName;
@@ -18,6 +18,7 @@ public class Employee {
     public double MaximumHours;
     public double Wage;
     public double TotalWorkHours;
+    public double HoursWorkedPerPayPeriod;
 
     public boolean Fired;
     public String FiredDate;
@@ -26,11 +27,11 @@ public class Employee {
 
 
     public void SaveData(){
-       //PayRollAPI.SaveNewEmployeeData(this);
+       PayRollAPI.SaveNewEmployeeData(this);
     }
 
     //Utilites
-    public boolean isEmployeeOf(Business business){
-        return business.UID == EmployerUID;
+    public boolean isFired(){
+        return Fired;
     }
 }

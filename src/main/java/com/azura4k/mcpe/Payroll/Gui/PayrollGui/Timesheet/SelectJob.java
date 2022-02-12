@@ -1,4 +1,4 @@
-package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage;
+package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Timesheet;
 import cn.nukkit.Player;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD.CreateBusiness;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Options;
@@ -9,7 +9,7 @@ import ru.contentforge.formconstructor.form.handler.SimpleFormHandler;
 import java.util.ArrayList;
 
 
-public class SelectMenu {
+public class SelectJob {
 
     SimpleForm form = new SimpleForm("Testing Forms");
     PayRollAPI api = new PayRollAPI();
@@ -23,7 +23,7 @@ public class SelectMenu {
             final String businessName = api.LoadBusiness(Employers.get(i)).BusinessName;
             form.addButton(businessName, Handler);
         }
-        form.addButton(PayRollAPI.getLanguage("CreateBusinessButton"), CreateBusinessHandler);
+
         form.setNoneHandler(p -> {
             p.sendMessage("Goodbye");
         });
@@ -33,12 +33,6 @@ public class SelectMenu {
     SimpleFormHandler Handler = (p, button) ->{
         Options options = new Options();
         options.initialize(p, api.LoadBusiness(button.getName()));
-    };
-
-    SimpleFormHandler CreateBusinessHandler = (p, button) -> {
-        CreateBusiness CreateBusiness = new CreateBusiness();
-        CreateBusiness.initialize(p);
-
     };
 
 

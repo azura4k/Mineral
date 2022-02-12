@@ -1,6 +1,7 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD;
 
 import cn.nukkit.Player;
+import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Options;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
@@ -20,7 +21,6 @@ public class BusinessInfo {
         //Checks if Player is Owner
         if (Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
             Form.addElement(PayRollAPI.getLanguage("ManageBusinessInfoFormNameBelowOwner") + business.BusinessName);
-            Form.addElement("-------------");
             Form.addElement("BusinessDesc", Input.builder().setName(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc")).setPlaceholder(business.BusinessDesc).build());
             Form.addElement("MaxRank", Input.builder().setName(PayRollAPI.getLanguage("ManageBusinessInfoFormMaxRank")).setPlaceholder(String.valueOf(business.MaxRank)).build());
             Form.addElement("MinRank", Input.builder().setName(PayRollAPI.getLanguage("ManageBusinessInfoFormMin")).setPlaceholder(String.valueOf(business.MinRank)).build());
@@ -29,7 +29,6 @@ public class BusinessInfo {
         }
         else if (employee.Rank >= business.TrustedRank && !Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
             Form.addElement(PayRollAPI.getLanguage("ManageBusinessInfoFormNameBelowOwner") + business.BusinessName);
-            Form.addElement("-------------");
             Form.addElement("BusinessDesc",Input.builder().setName(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc")).setPlaceholder(business.BusinessDesc).build());
             Form.addElement("MaxRank",Input.builder().setName(PayRollAPI.getLanguage("ManageBusinessInfoFormMaxRank")).setPlaceholder(String.valueOf(business.MaxRank)).build());
             Form.addElement("MinRank",Input.builder().setName(PayRollAPI.getLanguage("ManageBusinessInfoFormMin")).setPlaceholder(String.valueOf(business.MinRank)).build());
@@ -37,7 +36,6 @@ public class BusinessInfo {
         }
         else if (employee.Rank < business.TrustedRank) {
             Form.addElement(PayRollAPI.getLanguage("ManageBusinessInfoFormNameBelowOwner") + business.BusinessName);
-            Form.addElement("-------------");
             Form.addElement(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc") + business.BusinessDesc);
             Form.addElement(PayRollAPI.getLanguage("ManageBusinessInfoFormMaxRank") + business.MaxRank);
             Form.addElement(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc") + business.MinRank);
@@ -60,6 +58,9 @@ public class BusinessInfo {
             }
             business.SaveData();
             p.getPlayer().sendMessage(PayRollAPI.getLanguage("SuccessfullyUpdated"));
+
+            Options options = new Options();
+            options.initialize(player, business);
         });
 
 

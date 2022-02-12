@@ -20,6 +20,8 @@ public class Withdraw {
 
             if (business.Withdraw(employee, Amount)){
                 p.sendMessage(PayRollAPI.getLanguage("WithdrawFormSuccesful") + Amount);
+                Treasury form = new Treasury();
+                form.initialize(player, business, employee);
             }
             else{
                 p.sendMessage(PayRollAPI.getLanguage("BusinessOverdraftRisk"));

@@ -20,6 +20,8 @@ public class Deposit {
             Double Amount = Double.valueOf(response.getInput("Amount").getValue());
             if (business.Deposit(employee, Amount)){
                 p.sendMessage(PayRollAPI.getLanguage("DepositFormSuccesful") + Amount);
+                Treasury form = new Treasury();
+                form.initialize(player, business, employee);
             }
             else{
                 p.sendMessage(PayRollAPI.getLanguage("OverDraftRisk"));

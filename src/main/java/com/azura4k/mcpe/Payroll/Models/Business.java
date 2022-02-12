@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public class Business {
 
+    PayRollAPI api = new PayRollAPI();
+
     public String BusinessName;
     public String BusinessDesc;
     public String CreationDate;
@@ -24,9 +26,6 @@ public class Business {
     }
 
     //Bank actions
-    public double getBalance(){
-        return Balance;
-    }
     public boolean Deposit(Employee Depositor, double DepositValue) {
         //Returns true if done, returns false if not.
 
@@ -62,5 +61,16 @@ public class Business {
         else {
             return false;
         }
+    }
+
+    public void reload(){
+       Business Reloaded = api.LoadBusiness(this.BusinessName);
+       this.BusinessDesc = Reloaded.BusinessDesc;
+       this.Owner = Reloaded.Owner;
+       this.Balance = Reloaded.Balance;
+       this.TrustedRank = Reloaded.TrustedRank;
+       this.MaxRank = Reloaded.MaxRank;
+       this.MinRank = Reloaded.MinRank;
+       this.Employees = Reloaded.Employees;
     }
 }

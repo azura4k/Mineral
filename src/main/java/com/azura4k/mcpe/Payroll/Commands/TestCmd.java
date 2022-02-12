@@ -39,6 +39,8 @@ public class TestCmd extends Command {
         //commandSender.getServer().getLogger().info(String.valueOf(business.Balance));
         Business business = api.LoadBusiness(Args);
         Employee employee = api.LoadEmployee(business, Args2);
+        employee.Wage += 10;
+        employee.SaveData();
         commandSender.getServer().getLogger().info(employee.playerUUID.toString());
         return true;
     }

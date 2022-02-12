@@ -14,7 +14,11 @@
           permission: Payroll.cmd
       timesheet:
           description:  Open GUI to clock in, clock out of work.
-          usage: /timesheet <business>
+          usage: /timesheet
+          permission: Payroll.cmd
+      joboffer:
+          description: Open GUI to accept or reject job offers.
+          usage: /joboffer
           permission: Payroll.cmd
       test:
           description: Test

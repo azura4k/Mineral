@@ -1,6 +1,7 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Bank.Treasury;
 
 import cn.nukkit.Player;
+import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Options;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
@@ -18,6 +19,7 @@ public class Treasury {
         form.addContent(PayRollAPI.getLanguage("BankOptionsFormBalanceText") + business.Balance);
         form.addButton(PayRollAPI.getLanguage("BankOptionsFormDepositButton"), Deposit);
         form.addButton(PayRollAPI.getLanguage("BankOptionsFormWithdrawButton"), Withdraw);
+        form.addButton(PayRollAPI.getLanguage("BackButton"),  BackButton);
         form.send(player);
     }
 
@@ -30,6 +32,11 @@ public class Treasury {
     SimpleFormHandler Withdraw = (p, button) -> {
         Withdraw form = new Withdraw();
         form.initialize(p.getPlayer(), Business, employee);
+    };
+
+    SimpleFormHandler BackButton = (p, button) -> {
+        Options options = new Options();
+        options.initialize(p.getPlayer(), Business);
     };
 
 

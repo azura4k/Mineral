@@ -294,6 +294,9 @@ public class PayRollAPI{
 
         LlamaEconomy.getAPI().addMoney(employee.playerUUID, Income - TaxSubtraction);
 
+        plugin.getServer().getPlayerExact(employee.PlayerName).sendMessage(getLanguage("PayOutEmployee") + (Income - TaxSubtraction) + getLanguage("PayOutEmployeeBusiness") + employee.EmployerName);
+
+
         Business Employer = LoadBusiness(employee.EmployerName);
         Employer.Balance -= Income - TaxSubtraction;
         employee.MinutesWorkedPerPayPeriod = 0.0;
@@ -303,8 +306,7 @@ public class PayRollAPI{
 
     public void RegisterOnClock(Player player,Employee employee) {
         String Key = employee.PlayerName.toLowerCase();
-        if (!Clock.isSection(Key)) {
-
+        if (!Clock.isSection(Key) && LoadBusiness(employee.EmployerName).Balance > 0) {
             Clock.set(Key + ".ClockInTime", getTime());
             Clock.set(Key + ".MaxMinutes", employee.MaximumMinutes);
             Clock.set(Key + ".BusinessName", employee.EmployerName);
@@ -312,7 +314,7 @@ public class PayRollAPI{
             Clock.reload();
         }
         else {
-            player.sendMessage("You Are Already Clocked In");
+            player.sendMessage(getLanguage("CannotClockInOrInDebt"));
         }
     }
     public void RegisterOffClock(Employee employee) {
@@ -327,7 +329,26 @@ public class PayRollAPI{
             Clock.save();
             Clock.reload();
         }
-        else{plugin.getServer().getPlayerExact(employee.PlayerName).sendMessage("Not Clocked In");}
+        else{plugin.getServer().getPlayerExact(employee.PlayerName).sendMessage(getLanguage("NotClockedIn"));}
+    }
+
+    public void ForceClockOut(Player player) {
+        String Key0 = player.getName().toLowerCase();
+        String Key1 = player.getName().toLowerCase() + ".ClockInTime";
+        String Key2 = player.getName().toLowerCase()  + ".BusinessName";
+
+        if (Clock.isSection(Key0)) {
+            long ClockInTime = Clock.getLong(Key1);
+            String BusinessName = Clock.getString(Key2);
+            long Difference = TimeUnit.MILLISECONDS.toMinutes(Math.abs(getTime() - ClockInTime ));
+            Employee employee = LoadEmployee(LoadBusiness(BusinessName), player.getName());
+            employee.MinutesWorkedPerPayPeriod += Difference;
+            employee.TotalWorkMinutes += Difference;
+            employee.SaveData();
+            Clock.remove(employee.PlayerName);
+            Clock.save();
+            Clock.reload();
+        }
     }
 
     public void windDownTimer() {
@@ -340,14 +361,10 @@ public class PayRollAPI{
                 long MaxTime = TimeUnit.MINUTES.toMillis((long) Clock.getDouble(Key2));
                 long Difference = getTime() - ClockInTime;
 
-                plugin.getServer().getLogger().info(String.valueOf(getTime()));
-                plugin.getServer().getLogger().info(String.valueOf(MaxTime));
-                plugin.getServer().getLogger().info(String.valueOf(Difference));
-
                 if (Difference > MaxTime) {
                     Business business = LoadBusiness(Clock.getString(Key3));
                     RegisterOffClock(LoadEmployee(business, PlayerName));
-                    plugin.getServer().getPlayerExact(PlayerName).sendMessage("Forcefully Clocked Out. Maximum Minutes Exceeded");
+                    plugin.getServer().getPlayerExact(PlayerName).sendMessage(getLanguage("ForceClockOut"));
                 }
 
         }

@@ -1,6 +1,6 @@
   name: Payroll
   main: com.azura4k.mcpe.Payroll.PayrollBase
-  version: 1.0.1
+  version: 1.1.0
   api: 1.0.0
   description: A nice plugin for economy servers where players can start business and host jobs.
   author: Azura4k
@@ -19,6 +19,10 @@
       joboffer:
           description: Open GUI to accept or reject job offers.
           usage: /joboffer
+          permission: Payroll.cmd
+      payto:
+          description: Open GUI pay companies.
+          usage: /payto
           permission: Payroll.cmd
       permissions:
           payroll.cmd:

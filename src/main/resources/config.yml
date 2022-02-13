@@ -97,6 +97,7 @@ Language:
   NoValueDetected: 'No Value Entered for'
   NoEmployeeFound: 'No Employee In this Business Found Under that Name'
   BackButton: 'Back'
+  HireeWarning: 'Please Note: Players Must be Online to Receive Job Invites'
 
 #Employee Form
   EmployeeSelectionFormTitle: 'Select an Employee'

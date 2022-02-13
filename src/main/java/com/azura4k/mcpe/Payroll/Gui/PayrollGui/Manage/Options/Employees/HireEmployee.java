@@ -15,7 +15,7 @@ public class HireEmployee {
     public void initalize(Player player, Business business){
         Business = business;
 
-
+        form.addElement(PayRollAPI.getLanguage("HireeWarning"));
         form.addElement("PlayerName", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerName")).build());
         form.addElement("Title", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerTitle")).build());
         form.addElement("MaxMinutes", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerMaxMinutes")).build());

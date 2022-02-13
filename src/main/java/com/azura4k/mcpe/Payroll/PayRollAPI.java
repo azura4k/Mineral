@@ -121,35 +121,41 @@ public class PayRollAPI{
         }
     }
     public void TransferOwner(Player player, Business business, String newOwnerName) {
-        String key = business.BusinessName + ".ownerName";
-        BusinessData.set(key, newOwnerName);
-        HireOwner(business.BusinessName, plugin.getServer().getPlayerExact(newOwnerName), "New Owner", 20,business.MaxRank, 20);
-        Employee OldOwner = LoadEmployee(business,player.getName());
-        OldOwner.Rank = business.MaxRank - 1;
+        try {
+
+            String key = business.BusinessName + ".ownerName";
+            BusinessData.set(key, newOwnerName);
+            HireOwner(business.BusinessName, plugin.getServer().getPlayerExact(newOwnerName), "New Owner", 20, business.MaxRank, 20);
+            Employee OldOwner = LoadEmployee(business, player.getName());
+            OldOwner.Rank = business.MaxRank - 1;
+
+        }
+        catch (Exception ignored){}
 
     }
     public void OfferPosition(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
         //If business data does not exist
-        String key2 = player.getUniqueId().toString() + "." + businessName;
-
-        String key = businessName + ".employees." + player.getName().toLowerCase();
-
-        if (!BusinessData.exists(key, true)){
-            JobList.set(key2 + ".Name", player.getUniqueId().toString());
-            JobList.set(key2 + ".PlayerUUID", player.getUniqueId().toString());
-            JobList.set(key2 + ".StartDate", getDate());
-            JobList.set(key2 + ".Title", title);
-            JobList.set(key2 + ".PlayerName", player.getName());
-            JobList.set(key2 + ".MaxHrs", MaxMinutes);
-            JobList.set(key2 + ".Rank", rank);
-            JobList.set(key2 + ".Wage", wage);
-            JobList.set(key2 + ".Fired", false);
-            JobList.set(key2 + ".FiredDate", "null");
-            JobList.set(key2 + ".MinutesWorked", 0.0);
-            JobList.set(key2 + ".TotalMinutesWorked", 0.0);
-            JobList.save();
-            JobList.reload();
-       }
+        try {
+            String key2 = player.getUniqueId().toString() + "." + businessName;
+            String key = businessName + ".employees." + player.getName().toLowerCase();
+            if (!BusinessData.exists(key, true)) {
+                JobList.set(key2 + ".Name", player.getUniqueId().toString());
+                JobList.set(key2 + ".PlayerUUID", player.getUniqueId().toString());
+                JobList.set(key2 + ".StartDate", getDate());
+                JobList.set(key2 + ".Title", title);
+                JobList.set(key2 + ".PlayerName", player.getName());
+                JobList.set(key2 + ".MaxHrs", MaxMinutes);
+                JobList.set(key2 + ".Rank", rank);
+                JobList.set(key2 + ".Wage", wage);
+                JobList.set(key2 + ".Fired", false);
+                JobList.set(key2 + ".FiredDate", "null");
+                JobList.set(key2 + ".MinutesWorked", 0.0);
+                JobList.set(key2 + ".TotalMinutesWorked", 0.0);
+                JobList.save();
+                JobList.reload();
+            }
+        }
+        catch (Exception ignored){}
     }
     public void AcceptPosition(Player player, String businessName){
         String key = player.getUniqueId().toString() + "." + businessName;
@@ -180,14 +186,10 @@ public class PayRollAPI{
         return employee;
     }
     public ArrayList<String> getAllJobOffers(Player player) {
-        ArrayList<String> businesses = new ArrayList<>();
         JobList.reload();
 
         Set<String> Businesses =  JobList.getSections(player.getUniqueId().toString()).getKeys(false);
-        for (String job : Businesses) {
-            businesses.add(job);
-            }
-        return businesses;
+        return new ArrayList<>(Businesses);
     }
     public void HireEmployee(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
         String key = businessName + ".employees." + player.getName().toLowerCase();
@@ -254,7 +256,6 @@ public class PayRollAPI{
     }
     public static void SaveNewEmployeeData(Employee employee) {
         String key = employee.EmployerName + ".employees." + employee.PlayerName;
-        plugin.getLogger().info(key);
         if (BusinessData.exists(key, true)){
             BusinessData.reload();
             BusinessData.set(key + ".Title", employee.Title);
@@ -336,12 +337,14 @@ public class PayRollAPI{
                 String Key3 = PlayerName.toLowerCase() + ".BusinessName";
 
                 long ClockInTime = Clock.getLong(Key1);
-                double MaxTime = Clock.getDouble(Key2);
+                long MaxTime = TimeUnit.MINUTES.toMillis((long) Clock.getDouble(Key2));
                 long Difference = getTime() - ClockInTime;
 
+                plugin.getServer().getLogger().info(String.valueOf(getTime()));
+                plugin.getServer().getLogger().info(String.valueOf(MaxTime));
+                plugin.getServer().getLogger().info(String.valueOf(Difference));
 
-
-                if (Difference >= MaxTime) {
+                if (Difference > MaxTime) {
                     Business business = LoadBusiness(Clock.getString(Key3));
                     RegisterOffClock(LoadEmployee(business, PlayerName));
                     plugin.getServer().getPlayerExact(PlayerName).sendMessage("Forcefully Clocked Out. Maximum Minutes Exceeded");
@@ -360,8 +363,7 @@ public class PayRollAPI{
     }
 
     public static Date getDate() {
-        Date now = new Date();
-        return now;
+        return new Date();
     }
 
     public static long getTime(){

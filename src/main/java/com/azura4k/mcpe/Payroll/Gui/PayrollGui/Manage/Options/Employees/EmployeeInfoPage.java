@@ -14,9 +14,10 @@ public class EmployeeInfoPage {
 
     public void initialize(Player player, Business business, Employee employee){
         CustomForm Form = new CustomForm(PayRollAPI.getLanguage("EmployeeProfileFormTitle"));
-
+        PayRollAPI api = new PayRollAPI();
+        Employee Manager = api.LoadEmployee(business, player.getName());
         //Checks if Player is Owner
-        if (Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
+        if (Objects.equals(Manager.playerUUID.toString(), business.Owner.getUniqueId().toString())){
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormName") + employee.PlayerName));
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormStartDate") + employee.StartDate));
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormTotalMinutesWorked") + employee.TotalWorkMinutes));
@@ -28,7 +29,7 @@ public class EmployeeInfoPage {
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormIsFired") + employee.Fired));
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormDateFired") + employee.FiredDate));
         }
-        else if (employee.Rank >= business.TrustedRank && !Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
+        else if (Manager.Rank >= business.TrustedRank && !Objects.equals(Manager.playerUUID.toString(), business.Owner.getUniqueId().toString())){
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormName") + employee.PlayerName));
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormStartDate") + employee.StartDate));
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormTotalMinutesWorked") + employee.TotalWorkMinutes));
@@ -40,7 +41,7 @@ public class EmployeeInfoPage {
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormIsFired") + employee.Fired));
             Form.addElement( new Label(PayRollAPI.getLanguage("EmployeeProfileFormDateFired") + employee.FiredDate));
         }
-        else if (employee.Rank < business.TrustedRank) {
+        else if (Manager.Rank < business.TrustedRank) {
             Form.addElement( PayRollAPI.getLanguage("EmployeeProfileFormName") + employee.PlayerName);
             Form.addElement( PayRollAPI.getLanguage("EmployeeProfileFormEmpTitle") + employee.Title);
             Form.addElement( PayRollAPI.getLanguage("EmployeeProfileFormRank") + employee.Rank);

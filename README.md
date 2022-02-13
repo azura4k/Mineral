@@ -3,6 +3,8 @@ A nukkit plugin for economy servers that adds paying players and running busines
 Heres some commands <br>
 
 ### Requires LlamaEconomy and FormConstructor
+
+### A majority of all lines, titles, and text can be edited within the config file in the languages tab.
 <br>
 
 /manage

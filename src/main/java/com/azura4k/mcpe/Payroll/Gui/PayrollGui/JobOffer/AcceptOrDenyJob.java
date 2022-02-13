@@ -20,7 +20,7 @@ public class AcceptOrDenyJob {
                 + PayRollAPI.getLanguage("JobChoiceContextWage") + positionDetails.Wage + "\n" +
                 PayRollAPI.getLanguage("JobChoiceContextTitle") + positionDetails.Title + "\n" +
                 PayRollAPI.getLanguage("JobChoiceContextRank") + positionDetails.Rank + "\n" +
-                PayRollAPI.getLanguage("JobChoiceContextMaxHours") + positionDetails.MaximumHours
+                PayRollAPI.getLanguage("JobChoiceContextMaxMinutes") + positionDetails.MaximumMinutes
         );
 
         form.setHandler( (p, result) -> {

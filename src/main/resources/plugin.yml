@@ -20,10 +20,6 @@
           description: Open GUI to accept or reject job offers.
           usage: /joboffer
           permission: Payroll.cmd
-      test:
-          description: Test
-          usage: /test <business>
-          permission: Payroll.cmd.admin
       permissions:
           payroll.cmd:
               description: Ability to use basic Payroll commands

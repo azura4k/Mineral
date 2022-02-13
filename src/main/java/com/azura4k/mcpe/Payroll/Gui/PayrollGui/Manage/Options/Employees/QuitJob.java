@@ -16,16 +16,15 @@ public class QuitJob {
     ModalForm QuitJob = new ModalForm();
     public void Initialize(Player player, Business business, Employee employee){
 
-        QuitJob.setContent("Are you sure you wish to quit your position at: " + employee.EmployerName);
-        QuitJob.setPositiveButton("Yes");
-        QuitJob.setNegativeButton("No");
+        QuitJob.setContent(PayRollAPI.getLanguage("QuitPositionFormContent") + employee.EmployerName);
+        QuitJob.setPositiveButton(PayRollAPI.getLanguage("QuitPositionFormYes"));
+        QuitJob.setNegativeButton("QuitPositionFormNo");
 
         QuitJob.setHandler((p, result) -> {
             if (result){
                 api.FireEmployee(employee);
             }
             else if (!result){
-                p.sendMessage("Not Quiting");
                 Options options = new Options();
                 options.initialize(player,business);
             }

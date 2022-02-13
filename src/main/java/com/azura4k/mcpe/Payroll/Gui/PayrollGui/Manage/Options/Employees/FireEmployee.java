@@ -8,14 +8,14 @@ import ru.contentforge.formconstructor.form.ModalForm;
 
 public class FireEmployee {
 
-    ModalForm form = new ModalForm("Termination");
+    ModalForm form = new ModalForm(PayRollAPI.getLanguage("EmployeeTerminationModalTitle"));
     PayRollAPI api = new PayRollAPI();
 
 
     public void initialize (Player player, Business business, Employee employee){
-        form.addContent("Are you sure you want to terminate employment of " + employee.PlayerName + " with " + employee.EmployerName);
-        form.setPositiveButton("Yes");
-        form.setNegativeButton("No");
+        form.addContent(PayRollAPI.getLanguage("EmployeeTerminationModalContentPt1") + employee.PlayerName + PayRollAPI.getLanguage("EmployeeTerminationModalContentPt2") + employee.EmployerName);
+        form.setPositiveButton(PayRollAPI.getLanguage("EmployeeTerminationModalYesButton"));
+        form.setNegativeButton(PayRollAPI.getLanguage("EmployeeTerminationModalNoButton"));
         form.setHandler( (p, result) ->{
             if (result){
                 api.FireEmployee(employee);
@@ -23,7 +23,7 @@ public class FireEmployee {
                 employeeSelection.Initialize(p, business);
             }
             else if(!result){
-                p.sendMessage("Aborted Termination of Player");
+                p.sendMessage(PayRollAPI.getLanguage("EmployeeTerminationAbortionMessage"));
                 EmployeeSelection employeeSelection = new EmployeeSelection();
                 employeeSelection.Initialize(p, business);
             }

@@ -3,19 +3,16 @@
 
 #Money required to start a business
 #This is required to subtract from a persons account.
-IntialStartupCost: 0
-
-#Payout Time, per minecraft days to pay an employee
-PaydayTime: 14
+IntialStartupCost: 5000
 
 #Minimum Wage an employer can have.
 MinimumWage: 10
 
-#Recipt Generation
-GenerateRecipt: true
-
 #Tax Percent
 TaxPercent : 0.0
+
+#For every millisecond to check to see if a player needs force clockout
+ForceClockOutInMilliseconds: 5000
 
 
 #Here is all the Language Stuff
@@ -99,7 +96,7 @@ Language:
   SuccessfullyUpdated: 'Information Successfully Updated'
   NoValueDetected: 'No Value Entered for'
   NoEmployeeFound: 'No Employee In this Business Found Under that Name'
-  BackButton: "Back"
+  BackButton: 'Back'
 
 #Employee Form
   EmployeeSelectionFormTitle: 'Select an Employee'
@@ -112,19 +109,21 @@ Language:
   EmployeeProfileFormStartDate: 'Start Date: '
   EmployeeProfileFormEmpTitle: 'Employee Title'
   EmployeeProfileFormRank: 'Employee Rank: '
-  EmployeeProfileFormMaxHours: 'Maximum Hours: '
+  EmployeeProfileFormMaxMinutes: 'Maximum Minutes: '
   EmployeeProfileFormWage: 'Wage: '
-  EmployeeProfileFormTotalHoursWorked: 'Total Hours Worked: '
-  EmployeeProfileFormHoursWorked: 'Hours Worked: '
+  EmployeeProfileFormTotalMinutesWorked: 'Total Minutes Worked: '
+  EmployeeProfileFormMinutesWorked: 'Minutes Worked: '
   EmployeeProfileFormIsFired: 'Is Fired: '
   EmployeeProfileFormDateFired: 'Fired on: '
 
+  EmployeeSelectionFormManage: 'Manage'
+  EmployeeSelectionFormTerm: 'Terminate'
 
 #Hire and Fire
   HireTitle: 'Hire Employee'
   HirePlayerName: 'Player Name'
   HirePlayerTitle: 'Title'
-  HirePlayerMaxHours: 'Max Hours'
+  HirePlayerMaxMinutes: 'Max Minutes'
   HirePlayerRank: 'Rank'
   HirePlayerWage: 'Wage'
   HiringError: 'Error With Application, Once value was either Null or Not reaching minimum. Please Check Standards'
@@ -137,7 +136,31 @@ Language:
   JobChoiceMenuNoButton: 'Deny Position'
 
   JobChoiceContextBusinessName: 'Working for: '
-  JobChoiceContextWage: 'Hourly Pay: '
+  JobChoiceContextWage: 'Minutely Pay: '
   JobChoiceContextTitle: 'Position: '
   JobChoiceContextRank: 'Ranking: '
-  JobChoiceContextMaxHours: 'Max Hours: '
+  JobChoiceContextMaxMinutes: 'Max Minutes: '
+
+#QuitPosition Form
+  QuitPositionFormContent: 'Are you sure you wish to quit your position at: '
+  QuitPositionFormYes: 'Yes'
+  QuitPositionFormNo: 'No'
+
+#Transfer Ownership Form
+  TransferOwnershipFormTitle: 'Transfer Ownership'
+  TransferOwnershipTextBoxName: 'New Owner Name'
+
+#EmployeeTermination
+  EmployeeTerminationModalTitle: 'Termination'
+  EmployeeTerminationModalContentPt1: 'Are you sure you want to terminate employment of '
+  EmployeeTerminationModalContentPt2: ' with '
+  EmployeeTerminationModalYesButton: 'Yes'
+  EmployeeTerminationModalNoButton: 'No'
+  EmployeeTerminationAbortionMessage: 'Aborted Termination of Player'
+
+#ClockInClockOut
+  ClockInButton: 'Clock In'
+  ClouckOutButton: 'Clock Out'
+  CurrentPayMinutes: 'Minutes for this period: '
+  ClockInJobSelectFormTitle: 'Select A Timecard'
+  PayoutOutButton: 'Pay Out'

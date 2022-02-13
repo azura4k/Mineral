@@ -16,9 +16,6 @@ public class JobOfferCmd extends Command {
         Player player = commandSender.getServer().getPlayerExact(commandSender.getName());
         OfferMenu form = new OfferMenu();
         form.initialize(player);
-
-
-
         return false;
     }
 }

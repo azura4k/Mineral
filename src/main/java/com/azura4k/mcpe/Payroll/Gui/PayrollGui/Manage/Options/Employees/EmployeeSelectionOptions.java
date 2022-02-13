@@ -3,6 +3,7 @@ package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Employees;
 import cn.nukkit.Player;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
+import com.azura4k.mcpe.Payroll.PayRollAPI;
 import ru.contentforge.formconstructor.form.SimpleForm;
 import ru.contentforge.formconstructor.form.handler.SimpleFormHandler;
 
@@ -28,9 +29,9 @@ public class EmployeeSelectionOptions {
     public void initialize (Player player, Business business, Employee employee){
         Business = business;
         Employee = employee;
-        form.addButton("Manage", manageHandler);
+        form.addButton(PayRollAPI.getLanguage("EmployeeSelectionFormManage"), manageHandler);
         if (!(Objects.equals(employee.PlayerName, business.Owner.getName()))){
-            form.addButton("Terminate", fireHandler);
+            form.addButton(PayRollAPI.getLanguage("EmployeeSelectionFormTerm"), fireHandler);
         }
         form.send(player);
     }

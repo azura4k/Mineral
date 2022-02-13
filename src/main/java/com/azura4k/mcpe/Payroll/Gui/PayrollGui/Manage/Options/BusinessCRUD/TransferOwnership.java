@@ -9,11 +9,11 @@ import ru.contentforge.formconstructor.form.element.Input;
 import java.util.Objects;
 
 public class TransferOwnership {
-    CustomForm form = new CustomForm();
+    CustomForm form = new CustomForm(PayRollAPI.getLanguage("TransferOwnershipFormTitle"));
     PayRollAPI api = new PayRollAPI();
     public void Initalize(Player player, Business business){
         if (Objects.equals(player, business.Owner)){
-            form.addElement("NewOwnerName", Input.builder().setName("New Owner").build());
+            form.addElement("NewOwnerName", Input.builder().setName(PayRollAPI.getLanguage("TransferOwnershipTextBoxName")).build());
 
             form.setHandler((p, response) -> {
                 if (response.getInput("NewOwnerName").getValue() != null && response.getInput("NewOwnerName").getValue().length() > 0 ){

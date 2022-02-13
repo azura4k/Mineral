@@ -18,7 +18,7 @@ public class HireEmployee {
 
         form.addElement("PlayerName", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerName")).build());
         form.addElement("Title", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerTitle")).build());
-        form.addElement("MaxHours", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerMaxHours")).build());
+        form.addElement("MaxMinutes", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerMaxMinutes")).build());
         form.addElement("Rank", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerRank")).build());
         form.addElement("Wage", Input.builder().setName(PayRollAPI.getLanguage("HirePlayerWage")).build());
 
@@ -26,13 +26,13 @@ public class HireEmployee {
         form.setHandler( (p, response) -> {
             String PlayerName = response.getInput("PlayerName").getValue();
             String Title = response.getInput("Title").getValue();
-            double Max_hours = Double.parseDouble(response.getInput("MaxHours").getValue());
+            double Max_Minutes = Double.parseDouble(response.getInput("MaxMinutes").getValue());
             int Rank = Integer.parseInt(response.getInput("Rank").getValue());
             double Wage = Double.parseDouble(response.getInput("Wage").getValue());
 
 
-            if((PlayerName != null && PlayerName.length() > 0) && (Title != null && Title.length() > 0) && (Max_hours != 0) && (Rank >= Business.MinRank && Rank <= business.MaxRank) &&  (Wage >= PayRollAPI.PluginConfig.getDouble("MinimumWage"))){
-                api.OfferPosition(Business.BusinessName, p.getPlayer().getServer().getPlayerExact(PlayerName), Title, Max_hours, Rank, Wage);
+            if((PlayerName != null && PlayerName.length() > 0) && (Title != null && Title.length() > 0) && (Max_Minutes != 0) && (Rank >= Business.MinRank && Rank <= business.MaxRank) &&  (Wage >= PayRollAPI.PluginConfig.getDouble("MinimumWage"))){
+                api.OfferPosition(Business.BusinessName, p.getPlayer().getServer().getPlayerExact(PlayerName), Title, Max_Minutes, Rank, Wage);
             }
             else
                 p.sendMessage(PayRollAPI.getLanguage("HiringError"));

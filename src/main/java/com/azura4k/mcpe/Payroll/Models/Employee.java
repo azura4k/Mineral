@@ -15,10 +15,10 @@ public class Employee {
     public String PlayerName;
     public String Title;
     public int Rank;
-    public double MaximumHours;
+    public double MaximumMinutes;
     public double Wage;
-    public double TotalWorkHours;
-    public double HoursWorkedPerPayPeriod;
+    public double TotalWorkMinutes;
+    public double MinutesWorkedPerPayPeriod;
 
     public boolean Fired;
     public String FiredDate;

@@ -15,7 +15,7 @@ public class SelectJob {
     PayRollAPI api = new PayRollAPI();
 
     public void initialize(Player player){
-        form.setTitle(PayRollAPI.getLanguage("SelectFormTitle"));
+        form.setTitle(PayRollAPI.getLanguage("ClockInJobSelectFormTitle"));
 
         ArrayList<String> Employers = api.getBusinessesEmployedAt(player);
 
@@ -23,16 +23,13 @@ public class SelectJob {
             final String businessName = api.LoadBusiness(Employers.get(i)).BusinessName;
             form.addButton(businessName, Handler);
         }
-
-        form.setNoneHandler(p -> {
-            p.sendMessage("Goodbye");
-        });
         form.send(player);
     }
 
     SimpleFormHandler Handler = (p, button) ->{
-        Options options = new Options();
-        options.initialize(p, api.LoadBusiness(button.getName()));
+        ClockInClockOut form = new ClockInClockOut();
+        form.initialize(p, api.LoadBusiness(button.getName()), api.LoadEmployee(api.LoadBusiness(button.getName()), p.getName()));
+
     };
 
 

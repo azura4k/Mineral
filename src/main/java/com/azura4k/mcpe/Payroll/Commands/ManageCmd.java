@@ -14,7 +14,6 @@ public class ManageCmd extends Command {
     public boolean execute(CommandSender commandSender, String s, String[] strings) {
 
         Player player = commandSender.getServer().getPlayerExact(commandSender.getName());
-        commandSender.getServer().getLogger().info("CommandSuccessful");
         SelectMenu form = new SelectMenu();
         form.initialize(player);
 

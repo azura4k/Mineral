@@ -12,11 +12,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
     <repositories>
-        <repository>
-            <id>lldv-repo</id>
-            <url>http://system01.lldv.net:8082/artifactory/libs-snapshot</url>
-        </repository>
         <repository>
             <id>nukkit-repo</id>
             <url>https://repo.nukkitx.com/snapshot</url>
@@ -40,7 +37,8 @@
             <groupId>net.lldv.llamaeconomy</groupId>
             <artifactId>LlamaEconomy</artifactId>
             <version>1.0.0V1-20201107.093932-1</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/LlamaEconomy.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>ru.contentforge</groupId>
@@ -48,6 +46,11 @@
             <version>1.1.2</version>
             <scope>system</scope>
             <systemPath>${basedir}/lib/FormConstructor.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>net.lldv.llamaeconomy</groupId>
+            <artifactId>LlamaEconomy</artifactId>
+            <version>1.0.0V1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

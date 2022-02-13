@@ -16,3 +16,10 @@ Used for players to payout, clock in, and clock out to their multiple jobs. <br>
 /joboffer
 Used by plays to accept employment oppertunties.<br>
 ![Preview](https://cloudburstmc.org/attachments/minecraft_20220213124327-jpg.3510/)
+
+/payto
+Used to pay businesses directly and not the players. You can also get recipts now.
+![Preview](https://cloudburstmc.org/attachments/minecraft_20220213142820-jpg.3512/)
+![Preview](https://cloudburstmc.org/attachments/minecraft_20220213142820-jpg.3512/)
+![Preview](https://cloudburstmc.org/attachments/minecraft_20220213142826-jpg.3513/)
+![Preview](https://cloudburstmc.org/attachments/minecraft_20220213142826-jpg.3514/)

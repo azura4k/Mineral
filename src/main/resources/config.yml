@@ -104,10 +104,10 @@ Language:
   PayedToBusiness: 'You have payed: '
   PayedToBusinessPt2: ' to: '
   ReceiptAuthor: 'Server'
-  ReceiptBusinessHeader: "Payed to Business Named \n -------------------- \n "
-  ReceiptAmountHeader: "In the Amount of \n -------------------- \n "
-  ReceiptEmployeeHeader: "With Representative \n -------------------- \n"
-  ReceiptReasonHeader: "For Reason of \n -------------------- \n "
+  ReceiptBusinessHeader: 'Payed to Business Named \n -------------------- \n '
+  ReceiptAmountHeader: 'In the Amount of \n -------------------- \n '
+  ReceiptEmployeeHeader: 'With Representative \n -------------------- \n'
+  ReceiptReasonHeader: 'For Reason of \n -------------------- \n '
 
   #PayToForm
   PayToFormTitle: 'Pay a business'
@@ -116,8 +116,8 @@ Language:
   PayToFormReason: 'Reason for'
   PayToFormEmployee: 'Representative'
   PayToFormAskforRecipt: 'Did you want a receipt?'
-  ReasonNotProvided: "Reason not Provided"
-  EmployeeNameNotProvided: "Employee Name not Provided"
+  ReasonNotProvided: 'Reason not Provided'
+  EmployeeNameNotProvided: 'Employee Name not Provided'
   BusinessNotFound: 'No Business Found'
 
 
@@ -187,6 +187,6 @@ Language:
   CurrentPayMinutes: 'Minutes for this period: '
   ClockInJobSelectFormTitle: 'Select A Timecard'
   PayoutOutButton: 'Pay Out'
-  NotClockedIn: "Not Clocked In"
-  CannotClockInOrInDebt: "You Are Already Clocked In or Your Employer is in Debt"
-  ForceClockOut: "Forcefully Clocked Out. Maximum Minutes Exceeded"
+  NotClockedIn: 'Not Clocked In'
+  CannotClockInOrInDebt: 'You Are Already Clocked In or Your Employer is in Debt'
+  ForceClockOut: 'Forcefully Clocked Out. Maximum Minutes Exceeded'

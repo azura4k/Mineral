@@ -389,7 +389,7 @@ public class PayRollAPI{
     }
 
     public static boolean NameNotTook(String Name){
-       if (!BusinessData.exists(Name.toLowerCase(),true)) {
+       if (!BusinessData.exists(Name.toLowerCase(),true) && !Name.contains(".")){
            return Name.length() > 0;
        }
        else {

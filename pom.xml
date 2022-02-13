@@ -6,7 +6,7 @@
 
     <groupId>com.azura4k.mcpe</groupId>
     <artifactId>Payroll</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0C.1</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

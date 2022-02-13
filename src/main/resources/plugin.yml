@@ -1,6 +1,6 @@
   name: Payroll
   main: com.azura4k.mcpe.Payroll.PayrollBase
-  version: 1.0.0
+  version: 1.0.1
   api: 1.0.0
   description: A nice plugin for economy servers where players can start business and host jobs.
   author: Azura4k

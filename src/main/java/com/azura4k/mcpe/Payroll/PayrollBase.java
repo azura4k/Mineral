@@ -1,19 +1,21 @@
 package com.azura4k.mcpe.Payroll;
-import cn.nukkit.command.SimpleCommandMap;
-import cn.nukkit.event.EventHandler;
-import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerQuitEvent;
-import cn.nukkit.plugin.PluginBase;
-import cn.nukkit.utils.TextFormat;
+
 import com.azura4k.mcpe.Payroll.Commands.JobOfferCmd;
 import com.azura4k.mcpe.Payroll.Commands.ManageCmd;
 import com.azura4k.mcpe.Payroll.Commands.PayToCmd;
 import com.azura4k.mcpe.Payroll.Commands.TimesheetCmd;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class PayrollBase extends PluginBase {
+public class PayrollBase extends JavaPlugin {
 
     //For Scheduling
     Timer timer = new Timer();
@@ -21,15 +23,23 @@ public class PayrollBase extends PluginBase {
     //For API
     PayRollAPI api;
 
+    private static Economy econ = null;
+    public static Economy getEconomy() {
+        return econ;
+    }
+
+
     @Override
     public void onLoad() {
         super.onLoad();
         getLogger().info("Starting Up");
-        SimpleCommandMap CM = this.getServer().getCommandMap();
-        CM.register("/manage", new ManageCmd());
-        CM.register("/timesheet", new TimesheetCmd());
-        CM.register("/joboffer", new JobOfferCmd());
-        CM.register("/payto", new PayToCmd());
+
+
+
+        this.getCommand("manage").setExecutor(new ManageCmd());
+        this.getCommand("timesheet").setExecutor(new TimesheetCmd());
+        this.getCommand("joboffer").setExecutor(new JobOfferCmd());
+        this.getCommand("payto").setExecutor(new PayToCmd());
 
     }
 
@@ -37,10 +47,14 @@ public class PayrollBase extends PluginBase {
     public void onEnable() {
         saveDefaultConfig();
         super.onEnable();
-        this.getLogger().info(TextFormat.GREEN + "Payroll has Loaded");
+        this.getLogger().info("Payroll has Loaded");
         PayRollAPI.Initialize(this);
          api = new PayRollAPI();
         this.getServer().getPluginManager().registerEvents(new AutoClockOut(), this);
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        econ = rsp.getProvider();
+
+
 
         //For every minute, check for the Wind Down
 
@@ -56,11 +70,11 @@ public class PayrollBase extends PluginBase {
     public void onDisable() {
         super.onDisable();
         timer.cancel();
-        this.getLogger().critical(TextFormat.RED + "Payroll has been Disabled");
+        this.getLogger().warning("Payroll has been Disabled");
     }
 }
 
-class AutoClockOut implements Listener{
+class AutoClockOut implements Listener {
     PayRollAPI api = new PayRollAPI();
     @EventHandler
     public void onDisconnect(PlayerQuitEvent event) {

@@ -1,36 +1,41 @@
 package com.azura4k.mcpe.Payroll;
 
-import cn.nukkit.Player;
-import cn.nukkit.utils.Config;
+
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
-import net.lldv.llamaeconomy.LlamaEconomy;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class PayRollAPI{
 
-    private static PayrollBase plugin;
+    public static PayrollBase plugin;
+
+    //TODO REWRITE STORAGE TO SQLITE
+
 
     private static Config BusinessData;
     private static Config JobList;
     private static Config Clock;
-    public static Config PluginConfig;
+    public static FileConfiguration PluginConfig;
+
+
 
 
     public static void Initialize(PayrollBase instance) {
-        instance.saveResource("/data/business.yml");
+        instance.saveResource("/data/business.yml", false);
         BusinessData = new Config(instance.getDataFolder() + "/data/business.yml", Config.YAML);
         instance.getLogger().info("Business Data YAML Ready.");
 
-        instance.saveResource("/data/joblist.yml");
+        instance.saveResource("/data/joblist.yml", false);
         JobList = new Config(instance.getDataFolder() + "/data/joblist.yml", Config.YAML);
         instance.getLogger().info("Joblist Data YAML Ready.");
 
-        instance.saveResource("/data/clock.yml");
+        instance.saveResource("/data/clock.yml", false);
         Clock = new Config(instance.getDataFolder() + "/data/clock.yml", Config.YAML);
         instance.getLogger().info("Clock Data YAML Ready.");
-
         PluginConfig = instance.getConfig();
 
         plugin = instance;
@@ -304,7 +309,7 @@ public class PayRollAPI{
         employee.SaveData();
     }
 
-    public void RegisterOnClock(Player player,Employee employee) {
+    public void RegisterOnClock(Player player, Employee employee) {
         String Key = employee.PlayerName.toLowerCase();
         if (!Clock.isSection(Key) && LoadBusiness(employee.EmployerName).Balance > 0) {
             Clock.set(Key + ".ClockInTime", getTime());

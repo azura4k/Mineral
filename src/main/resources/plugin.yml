@@ -5,8 +5,8 @@
   description: A nice plugin for economy servers where players can start business and host jobs.
   author: Azura4k
   depend:
-    - LlamaEconomy
-    - FormConstructor
+    - Vault
+    - Floodgate
   commands:
       manage:
           description: Open GUI to create, delete, or manage a business.

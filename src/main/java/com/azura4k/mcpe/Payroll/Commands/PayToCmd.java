@@ -1,26 +1,22 @@
 package com.azura4k.mcpe.Payroll.Commands;
 
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBookWritten;
+
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import ru.contentforge.formconstructor.form.CustomForm;
-import ru.contentforge.formconstructor.form.element.Input;
-import ru.contentforge.formconstructor.form.element.Toggle;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Item;
+import org.geysermc.cumulus.CustomForm;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PayToCmd extends Command {
-    public PayToCmd() {
-        super("Payto", "Open GUI to pay a business", "/payto");
-    }
-
+public class PayToCmd implements CommandExecutor {
     @Override
-    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         PayRollAPI api = new PayRollAPI();
         CustomForm form = new CustomForm(PayRollAPI.getLanguage("PayToFormTitle"));
 

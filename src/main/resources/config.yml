@@ -1,5 +1,5 @@
 #Payroll by Azura4k
-#Requires LlamaEconomy and FormConstructor
+#Requires Vault and Floodgate
 
 #Money required to start a business
 #This is required to subtract from a persons account.

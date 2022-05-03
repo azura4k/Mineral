@@ -7,14 +7,14 @@
       <option name="url" value="https://maven.pkg.github.com/ContentForge/FormConstructor" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="localMvnRepo" />
-      <option name="name" value="localMvnRepo" />
-      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/" />
+      <option name="id" value="opencollab-snapshot" />
+      <option name="name" value="opencollab-snapshot" />
+      <option name="url" value="https://repo.opencollab.dev/maven-snapshots/" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="localMvnRepo" />
       <option name="name" value="localMvnRepo" />
-      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/FormConstructor.jar" />
+      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
@@ -27,14 +27,29 @@
       <option name="url" value="https://repo.nukkitx.com/snapshot" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="jitpack.io" />
+      <option name="name" value="jitpack.io" />
+      <option name="url" value="https://jitpack.io" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="lldv-repo" />
       <option name="name" value="lldv-repo" />
       <option name="url" value="http://system01.lldv.net:8082/artifactory/libs-snapshot" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="spigot-repo" />
+      <option name="name" value="spigot-repo" />
+      <option name="url" value="https://hub.spigotmc.org/nexus/content/repositories/snapshots/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="localMvnRepo" />
       <option name="name" value="localMvnRepo" />
       <option name="url" value="file://$PROJECT_DIR$/src/main/resources" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="localMvnRepo" />
+      <option name="name" value="localMvnRepo" />
+      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/FormConstructor.jar" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />

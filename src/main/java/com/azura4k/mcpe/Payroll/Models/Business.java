@@ -1,8 +1,11 @@
 package com.azura4k.mcpe.Payroll.Models;
 
-import cn.nukkit.Player;
+
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import net.lldv.llamaeconomy.LlamaEconomy;
+
+import com.azura4k.mcpe.Payroll.PayrollBase;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
@@ -31,8 +34,9 @@ public class Business {
 
         //Check and see if Employee has rank to manage.
         if (Depositor.Rank > TrustedRank) {
-            if (LlamaEconomy.getAPI().getMoney(Depositor.playerUUID) >= DepositValue) {
-                LlamaEconomy.getAPI().reduceMoney(Depositor.playerUUID, DepositValue);
+            OfflinePlayer player = PayRollAPI.plugin.getServer().getOfflinePlayer(Depositor.playerUUID);
+            if (PayrollBase.getEconomy().getBalance(player) >= DepositValue) {
+                PayrollBase.getEconomy().withdrawPlayer(player, DepositValue);
                 Balance += DepositValue;
                 SaveData();
                 return true;
@@ -49,8 +53,9 @@ public class Business {
 
         //Check and see if Employee has rank to manage.
         if (Withdrawal.Rank > TrustedRank) {
+            OfflinePlayer player = PayRollAPI.plugin.getServer().getOfflinePlayer(Withdrawal.playerUUID);
             if (Balance >= WithdrawValue) {
-                LlamaEconomy.getAPI().addMoney(Withdrawal.playerUUID, WithdrawValue);
+                PayrollBase.getEconomy().depositPlayer(player, WithdrawValue);
                 Balance -= WithdrawValue;
                 SaveData();
                 return true;

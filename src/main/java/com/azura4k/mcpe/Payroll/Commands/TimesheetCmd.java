@@ -1,17 +1,15 @@
 package com.azura4k.mcpe.Payroll.Commands;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Timesheet.SelectJob;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class TimesheetCmd extends Command {
-    public TimesheetCmd() {
-        super("timesheet", "Open GUI to clock in, clock out of work.", "/timesheet <business>");
-    }
+public class TimesheetCmd implements CommandExecutor {
 
     @Override
-    public boolean execute(CommandSender commandSender, String s, String[] strings) {
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = commandSender.getServer().getPlayerExact(commandSender.getName());
         SelectJob form = new SelectJob();
         form.initialize(player);

@@ -1,24 +1,19 @@
 package com.azura4k.mcpe.Payroll.Commands;
 
-import cn.nukkit.Player;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
+
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.SelectMenu;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class ManageCmd extends Command {
-    public ManageCmd() {
-        super("manage", "Open GUI to create, delete, or manage a business.", "/Message");
-    }
-
+public class ManageCmd implements CommandExecutor {
     @Override
-    public boolean execute(CommandSender commandSender, String s, String[] strings) {
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
 
         Player player = commandSender.getServer().getPlayerExact(commandSender.getName());
         SelectMenu form = new SelectMenu();
         form.initialize(player);
-
-
-
         return false;
     }
 }

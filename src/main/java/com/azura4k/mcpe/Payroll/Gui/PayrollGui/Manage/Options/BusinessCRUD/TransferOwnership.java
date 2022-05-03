@@ -1,27 +1,30 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD;
 
-import cn.nukkit.Player;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import ru.contentforge.formconstructor.form.CustomForm;
-import ru.contentforge.formconstructor.form.element.Input;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.CustomForm;
+import org.geysermc.cumulus.response.CustomFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
+
 
 import java.util.Objects;
 
 public class TransferOwnership {
-    CustomForm form = new CustomForm(PayRollAPI.getLanguage("TransferOwnershipFormTitle"));
+    CustomForm.Builder form = CustomForm.builder();
     PayRollAPI api = new PayRollAPI();
-    public void Initalize(Player player, Business business){
+    public void Initialize(Player player, Business business){
+        form.title(PayRollAPI.getLanguage("TransferOwnershipFormTitle"));
         if (Objects.equals(player, business.Owner)){
-            form.addElement("NewOwnerName", Input.builder().setName(PayRollAPI.getLanguage("TransferOwnershipTextBoxName")).build());
-
-            form.setHandler((p, response) -> {
-                if (response.getInput("NewOwnerName").getValue() != null && response.getInput("NewOwnerName").getValue().length() > 0 ){
-                    api.TransferOwner(player, business,response.getInput("NewOwnerName").getValue() );
+            form.input(PayRollAPI.getLanguage("TransferOwnershipTextBoxName"));
+            form.responseHandler((form, responseData) -> {
+                CustomFormResponse response = form.parseResponse(responseData);
+                if (response.getInput(1) != null && response.getInput(1).length() > 0 ){
+                    api.TransferOwner(player, business,response.getInput(1));
                 }
             });
 
-            form.send(player);
+            FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
 
         }
     }

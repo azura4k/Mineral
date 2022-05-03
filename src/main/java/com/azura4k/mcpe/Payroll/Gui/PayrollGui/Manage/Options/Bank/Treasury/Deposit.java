@@ -1,33 +1,36 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Bank.Treasury;
 
-import cn.nukkit.Player;
+
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import ru.contentforge.formconstructor.form.CustomForm;
-import ru.contentforge.formconstructor.form.element.Input;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.CustomForm;
+import org.geysermc.cumulus.response.CustomFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
+
 
 public class Deposit {
 
     PayRollAPI api = new PayRollAPI();
-    CustomForm form = new CustomForm(PayRollAPI.getLanguage("DepositFormTitle"));
-
+    CustomForm.Builder form = CustomForm.builder();
     public void initialize(Player player, Business business, Employee employee){
-
-        form.addElement(PayRollAPI.getLanguage("DepositFormCurrentBalance") + business.Balance);
-        form.addElement("Amount" ,Input.builder().setName(PayRollAPI.getLanguage("DepositFormEnterAmount")).build());
-        form.setHandler((p, response) -> {
-            Double Amount = Double.valueOf(response.getInput("Amount").getValue());
+        form.title(PayRollAPI.getLanguage("DepositFormTitle"));
+        form.label(PayRollAPI.getLanguage("DepositFormCurrentBalance") + business.Balance);
+        form.input(PayRollAPI.getLanguage("DepositFormEnterAmount"));
+        form.responseHandler((form, responseData) -> {
+            CustomFormResponse response = form.parseResponse(responseData);
+            Double Amount = Double.valueOf(response.getInput(1));
             if (business.Deposit(employee, Amount)){
-                p.sendMessage(PayRollAPI.getLanguage("DepositFormSuccesful") + Amount);
-                Treasury form = new Treasury();
-                form.initialize(player, business, employee);
+                player.sendMessage(PayRollAPI.getLanguage("DepositFormSuccesful") + Amount);
+                Treasury customForm = new Treasury();
+                customForm.initialize(player, business, employee);
             }
             else{
-                p.sendMessage(PayRollAPI.getLanguage("OverDraftRisk"));
+                player.sendMessage(PayRollAPI.getLanguage("OverDraftRisk"));
             }
         });
-        form.send(player);
+       FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }
 
 }

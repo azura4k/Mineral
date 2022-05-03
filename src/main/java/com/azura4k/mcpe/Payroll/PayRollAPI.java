@@ -16,9 +16,9 @@ public class PayRollAPI{
     //TODO REWRITE STORAGE TO SQLITE
 
 
-    private static Config BusinessData;
-    private static Config JobList;
-    private static Config Clock;
+    private static FileConfiguration BusinessData;
+    private static FileConfiguration JobList;
+    private static FileConfiguration Clock;
     public static FileConfiguration PluginConfig;
 
 
@@ -192,7 +192,6 @@ public class PayRollAPI{
     }
     public ArrayList<String> getAllJobOffers(Player player) {
         JobList.reload();
-
         Set<String> Businesses =  JobList.getSections(player.getUniqueId().toString()).getKeys(false);
         return new ArrayList<>(Businesses);
     }

@@ -34,7 +34,7 @@ public class SelectMenu {
                 CreateBusiness CreateBusiness = new CreateBusiness();
                 CreateBusiness.initialize(player);
             }
-            else if (!response.getClickedButton().getText().equals(PayRollAPI.getLanguage("CreateBusinessButton")))){
+            else if (!response.getClickedButton().getText().equals(PayRollAPI.getLanguage("CreateBusinessButton"))){
                 Options options = new Options();
                 options.initialize(player, api.LoadBusiness(response.getClickedButton().getText()));
             }

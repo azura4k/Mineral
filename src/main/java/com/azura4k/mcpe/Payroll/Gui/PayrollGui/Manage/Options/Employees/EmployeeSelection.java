@@ -1,13 +1,14 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Employees;
 
-import cn.nukkit.Player;
+
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Options;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import ru.contentforge.formconstructor.form.Form;
-import ru.contentforge.formconstructor.form.SimpleForm;
-import ru.contentforge.formconstructor.form.handler.SimpleFormHandler;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.SimpleForm;
+import org.geysermc.cumulus.response.SimpleFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.util.Objects;
 
@@ -18,38 +19,37 @@ public class EmployeeSelection {
     Business Business;
     Employee employee;
 
-
-    SimpleFormHandler EmployeeClick = (p, button) -> {
-        EmployeeSelectionOptions form = new EmployeeSelectionOptions();
-        employee = api.LoadEmployee(Business, button.getName());
-        form.initialize(p, Business, employee);
-    };
-    SimpleFormHandler SearchClick = (p, button) -> {
-        EmployeeSelectionByName form = new EmployeeSelectionByName();
-        form.initalize(p, Business);
-    };
-    SimpleFormHandler BackButton = (player, button) -> {
-        Options form = new Options();
-        form.initialize(player, Business);
-    };
-
     public void Initialize(Player player, Business business){
-        SimpleForm form = new SimpleForm();
+        SimpleForm.Builder form = SimpleForm.builder();
         business.reload();
         Business = business;
-
-        form.addButton(PayRollAPI.getLanguage("EmployeeSelectionFormSearchButton"), SearchClick);
+        form.title(PayRollAPI.getLanguage("EmployeeSelectionFormTitle"));
+        form.button(PayRollAPI.getLanguage("EmployeeSelectionFormSearchButton"));
         for (int i = 0; i < business.Employees.size() ; i++) {
                 String Name = business.Employees.get(i).PlayerName;
-                if (Objects.equals(Name, Business.Owner.getName()) && !Objects.equals(player, business.Owner)) {
-
-                }
-                else {
-                    form.addButton(Name, EmployeeClick);
-                }
+            if (!Objects.equals(Name, Business.Owner.getName()) || Objects.equals(player, business.Owner)) {
+                form.button(Name);
+            }
 
         }
-        form.addButton(PayRollAPI.getLanguage("BackButton"), BackButton);
-        form.send(player);
+        form.button(PayRollAPI.getLanguage("BackButton"));
+
+        form.responseHandler((modal, reponseData) -> {
+            SimpleFormResponse response = modal.parseResponse(reponseData);
+            if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("EmployeeSelectionFormSearchButton"))) {
+                EmployeeSelectionByName customForm = new EmployeeSelectionByName();
+                customForm.initialize(player, Business);
+            }
+            else if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("BackButton"))){
+                Options customForm = new Options();
+                customForm.initialize(player, Business);
+            }
+            else if (response.isCorrect()){
+                EmployeeSelectionOptions customForm = new EmployeeSelectionOptions();
+                employee = api.LoadEmployee(Business, response.getClickedButton().getText());
+                customForm.initialize(player, Business, employee);
+            }
+        });
+        FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }
 }

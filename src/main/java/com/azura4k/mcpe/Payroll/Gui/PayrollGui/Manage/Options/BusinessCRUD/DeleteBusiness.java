@@ -1,24 +1,30 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD;
 
-import cn.nukkit.Player;
+
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Options;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.SelectMenu;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import ru.contentforge.formconstructor.form.ModalForm;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.ModalForm;
+import org.geysermc.cumulus.response.ModalFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
+
 
 public class DeleteBusiness {
     PayRollAPI api = new PayRollAPI();
-    ModalForm form = new ModalForm(PayRollAPI.getLanguage("DeleteBusinessFormTitle"));
+    ModalForm.Builder form = ModalForm.builder();
+
 
     public void initialize(Player player, Business business){
+        form.title(PayRollAPI.getLanguage("DeleteBusinessFormTitle"));
+        form.content(PayRollAPI.getLanguage("DeleteBusinessFormConfirmationText") + business.BusinessName);
+        form.button1(PayRollAPI.getLanguage("DeleteBusinessFormYesButton"));
+        form.button2(PayRollAPI.getLanguage("DeleteBusinessFormNoButton"));
 
-        form.setContent(PayRollAPI.getLanguage("DeleteBusinessFormConfirmationText") + business.BusinessName);
-        form.setPositiveButton(PayRollAPI.getLanguage("DeleteBusinessFormYesButton"));
-        form.setNegativeButton(PayRollAPI.getLanguage("DeleteBusinessFormNoButton"));
-
-        form.setHandler((p, result) -> {
-            if (result){
+        form.responseHandler((form, result) -> {
+            ModalFormResponse response = form.parseResponse(result);
+            if (response.getResult()){
                 api.DeleteBusiness(business, player);
                 SelectMenu selectMenu = new SelectMenu();
                 selectMenu.initialize(player);
@@ -26,8 +32,8 @@ public class DeleteBusiness {
             else {
                 player.sendMessage(PayRollAPI.getLanguage("DeleteBusinessFormAverted"));
                 Options menu = new Options();
-                menu.initialize(p, business);
+                menu.initialize(player, business);
             }});
-        form.send(player);
+        FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }
 }

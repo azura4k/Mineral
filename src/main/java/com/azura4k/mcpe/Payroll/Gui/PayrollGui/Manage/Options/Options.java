@@ -1,6 +1,5 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options;
 
-import cn.nukkit.Player;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Bank.Treasury.Treasury;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD.BusinessInfo;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD.DeleteBusiness;
@@ -11,55 +10,18 @@ import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Employees.QuitJob;
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.SelectMenu;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import ru.contentforge.formconstructor.form.SimpleForm;
-import ru.contentforge.formconstructor.form.handler.SimpleFormHandler;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.SimpleForm;
+import org.geysermc.cumulus.response.SimpleFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
+
 
 public class Options {
 
     PayRollAPI api = new PayRollAPI();
-    SimpleForm Options = new SimpleForm();
+    SimpleForm.Builder Options = SimpleForm.builder();
 
     public void initialize(Player player, Business business){
-
-        // All handlers for the different buttons.
-        SimpleFormHandler BusinessInfo = (p, button) ->{
-            BusinessInfo form = new BusinessInfo();
-            form.initialize(player, business);
-        };
-        SimpleFormHandler Treasury = (p, button) ->{
-            Treasury form = new Treasury();
-            form.initialize(p, business, api.LoadEmployee(business, player.getName()));
-        };
-
-        SimpleFormHandler HireEmployees = (p, button) ->{
-            HireEmployee form = new HireEmployee();
-            form.initalize(player, business);
-        };
-
-        SimpleFormHandler EmployeeInfo = (p, button) ->{
-            EmployeeSelection form = new EmployeeSelection();
-            form.Initialize(p, business);
-        };
-
-        SimpleFormHandler TransferOwner = (p, button) ->{
-            TransferOwnership form = new TransferOwnership();
-            form.Initalize(player, business);
-        };
-
-        SimpleFormHandler QuitJob = (p, button) ->{
-            QuitJob form = new QuitJob();
-            form.Initialize(p, business, api.LoadEmployee(business, player.getName()));
-        };
-
-        SimpleFormHandler DeleteBusiness = (p, button) ->{
-            DeleteBusiness form = new DeleteBusiness();
-            form.initialize(p, business);
-        };
-
-        SimpleFormHandler BackButton = (p, button) -> {
-            SelectMenu menu = new SelectMenu();
-            menu.initialize(p);
-        };
 
         //Variables
         String business_info = PayRollAPI.getLanguage("OptionsFormBusinessInfoButton");
@@ -73,33 +35,69 @@ public class Options {
         //Logic for building GUI
 
         if (player == business.Owner) {
-            Options.addButton(business_info, BusinessInfo);
-            Options.addButton(treasury, Treasury);
-            Options.addButton(hire_employee, HireEmployees);
-            Options.addButton(employee_info, EmployeeInfo);
-            Options.addButton(transfer_ownership, TransferOwner);
-            Options.addButton(delete_business, DeleteBusiness);
-            Options.addButton(back_button, BackButton);
-
+            Options.button(business_info);
+            Options.button(treasury);
+            Options.button(hire_employee);
+            Options.button(employee_info);
+            Options.button(transfer_ownership);
+            Options.button(delete_business);
+            Options.button(back_button);
         }
 
         if (api.LoadEmployee(business, player.getName()).Rank >= business.TrustedRank && player != business.Owner) {
-            Options.addButton(business_info, BusinessInfo);
-            Options.addButton(treasury, Treasury);
-            Options.addButton(hire_employee, HireEmployees);
-            Options.addButton(employee_info, EmployeeInfo);
-            Options.addButton(quit_job, QuitJob);
-            Options.addButton(back_button, BackButton);
+            Options.button(business_info);
+            Options.button(treasury);
+            Options.button(hire_employee);
+            Options.button(employee_info);
+            Options.button(quit_job);
+            Options.button(back_button);
         }
 
         if (api.LoadEmployee(business, player.getName()).Rank < business.TrustedRank && player != business.Owner) {
-            Options.addButton(business_info, BusinessInfo);
-            Options.addButton(employee_info, EmployeeInfo);
-            Options.addButton(quit_job, QuitJob);
-            Options.addButton(back_button, BackButton);
+            Options.button(business_info);
+            Options.button(employee_info);
+            Options.button(quit_job);
+            Options.button(back_button);
         }
 
-        Options.send(player);
+        Options.responseHandler((form, responseData) -> {
+            SimpleFormResponse response = form.parseResponse(responseData);
+            if (response.getClickedButton().getText().equals(business_info)){
+                BusinessInfo customForm = new BusinessInfo();
+                customForm.initialize(player, business);
+            }
+            else if (response.getClickedButton().getText().equals(treasury)){
+                Treasury customForm = new Treasury();
+                customForm.initialize(player, business, api.LoadEmployee(business, player.getName()));
+            }
+            else if (response.getClickedButton().getText().equals(employee_info)){
+                EmployeeSelection customForm = new EmployeeSelection();
+                customForm.Initialize(player, business);
+            }
+            else if (response.getClickedButton().getText().equals(hire_employee)){
+                HireEmployee customForm = new HireEmployee();
+                customForm.initalize(player, business);
+            }
+            else if (response.getClickedButton().getText().equals(transfer_ownership)){
+                TransferOwnership customForm = new TransferOwnership();
+                customForm.Initialize(player, business);
+            }
+            else if (response.getClickedButton().getText().equals(quit_job)){
+                QuitJob customForm = new QuitJob();
+                customForm.Initialize(player, business, api.LoadEmployee(business, player.getName()));
+            }
+            else if (response.getClickedButton().getText().equals(delete_business)){
+                DeleteBusiness customForm = new DeleteBusiness();
+                customForm.initialize(player, business);
+            }
+            else if (response.getClickedButton().getText().equals(back_button)){
+                SelectMenu menu = new SelectMenu();
+                menu.initialize(player);
+            }
+        });
+
+
+        FloodgateApi.getInstance().sendForm(player.getUniqueId(), Options);
 
     }
 }

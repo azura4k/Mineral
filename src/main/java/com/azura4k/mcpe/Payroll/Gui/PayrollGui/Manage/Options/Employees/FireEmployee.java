@@ -1,35 +1,40 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Employees;
 
-import cn.nukkit.Player;
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import ru.contentforge.formconstructor.form.ModalForm;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.ModalForm;
+import org.geysermc.cumulus.response.ModalFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
+
 
 public class FireEmployee {
 
-    ModalForm form = new ModalForm(PayRollAPI.getLanguage("EmployeeTerminationModalTitle"));
+    ModalForm.Builder form = ModalForm.builder();
     PayRollAPI api = new PayRollAPI();
 
 
     public void initialize (Player player, Business business, Employee employee){
-        form.addContent(PayRollAPI.getLanguage("EmployeeTerminationModalContentPt1") + employee.PlayerName + PayRollAPI.getLanguage("EmployeeTerminationModalContentPt2") + employee.EmployerName);
-        form.setPositiveButton(PayRollAPI.getLanguage("EmployeeTerminationModalYesButton"));
-        form.setNegativeButton(PayRollAPI.getLanguage("EmployeeTerminationModalNoButton"));
-        form.setHandler( (p, result) ->{
-            if (result){
+        form.title(PayRollAPI.getLanguage("EmployeeTerminationModalTitle"));
+        form.content(PayRollAPI.getLanguage("EmployeeTerminationModalContentPt1") + employee.PlayerName + PayRollAPI.getLanguage("EmployeeTerminationModalContentPt2") + employee.EmployerName);
+        form.button1(PayRollAPI.getLanguage("EmployeeTerminationModalYesButton"));
+        form.button2(PayRollAPI.getLanguage("EmployeeTerminationModalNoButton"));
+        form.responseHandler( (form, data) ->{
+            ModalFormResponse result = form.parseResponse(data);
+            if (result.getResult()){
                 api.FireEmployee(employee);
                 EmployeeSelection employeeSelection = new EmployeeSelection();
-                employeeSelection.Initialize(p, business);
+                employeeSelection.Initialize(player, business);
             }
-            else if(!result){
-                p.sendMessage(PayRollAPI.getLanguage("EmployeeTerminationAbortionMessage"));
+            else if(!result.getResult()){
+                player.sendMessage(PayRollAPI.getLanguage("EmployeeTerminationAbortionMessage"));
                 EmployeeSelection employeeSelection = new EmployeeSelection();
-                employeeSelection.Initialize(p, business);
+                employeeSelection.Initialize(player, business);
             }
         }
         );
-        form.send(player);
+        FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
 
     }
 }

@@ -1,40 +1,46 @@
 package com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.BusinessCRUD;
 
-import cn.nukkit.Player;
-import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.Options.Options;
+
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.Manage.SelectMenu;
 import com.azura4k.mcpe.Payroll.PayRollAPI;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import ru.contentforge.formconstructor.form.CustomForm;
-import ru.contentforge.formconstructor.form.element.Input;
+import com.azura4k.mcpe.Payroll.PayrollBase;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.geysermc.cumulus.CustomForm;
+import org.geysermc.cumulus.response.CustomFormResponse;
+import org.geysermc.floodgate.api.FloodgateApi;
+
 
 public class CreateBusiness {
 
-    CustomForm form = new CustomForm(PayRollAPI.getLanguage("CreateBusinessFormTitle"));
+    CustomForm.Builder form = CustomForm.builder();
     Double StartupCost = PayRollAPI.PluginConfig.getDouble("IntialStartupCost");
     PayRollAPI api = new PayRollAPI();
 
     public void initialize(Player player) {
-
-        form.addElement("BusinessName", Input.builder().setName(PayRollAPI.getLanguage("CreateBusinessFormNameLabel")).build());
-        form.addElement("BusinessDesc", Input.builder().setName(PayRollAPI.getLanguage("CreateBusinessFormDescriptionLabel")).build());
-        form.addElement(PayRollAPI.getLanguage("CreateBusinessFormStartupCost") + StartupCost);
-        form.send(player);
-        form.setHandler((p, response) -> {
-            if (LlamaEconomy.getAPI().getMoney(p.getPlayer()) >= StartupCost){
-                LlamaEconomy.getAPI().reduceMoney(p.getUniqueId(), StartupCost);
-                if (api.CreateBusiness(response.getInput("BusinessName").getValue(), response.getInput("BusinessDesc").getValue(), p.getPlayer())){
-                    SelectMenu form = new SelectMenu();
-                    form.initialize(player);
+        form.title(PayRollAPI.getLanguage("CreateBusinessFormTitle"));
+        form.input(PayRollAPI.getLanguage("CreateBusinessFormNameLabel"));
+        form.input(PayRollAPI.getLanguage("CreateBusinessFormDescriptionLabel"));
+        form.label(PayRollAPI.getLanguage("CreateBusinessFormStartupCost") + StartupCost);
+        form.responseHandler((form, reponseData)->{
+            CustomFormResponse response = form.parseResponse(reponseData);
+            OfflinePlayer player2 = PayRollAPI.plugin.getServer().getOfflinePlayer(player.getUniqueId());
+            if (PayrollBase.getEconomy().getBalance(player2) >= StartupCost){
+                PayrollBase.getEconomy().withdrawPlayer(player2, StartupCost);
+                if (api.CreateBusiness(response.getInput(1), response.getInput(2), player)){
+                    SelectMenu customForm = new SelectMenu();
+                    customForm.initialize(player);
                 }
                 else {
-                    p.sendMessage(PayRollAPI.getLanguage("BusinessNameAlrRegistered"));
+                    player.sendMessage(PayRollAPI.getLanguage("BusinessNameAlrRegistered"));
                 }
             }
             else {
-                p.sendMessage(PayRollAPI.getLanguage("OverDraftRisk d"));
+                player.sendMessage(PayRollAPI.getLanguage("OverDraftRisk d"));
             }
         });
+        FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
+
     }
 
 

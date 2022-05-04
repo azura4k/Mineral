@@ -4,6 +4,7 @@ import com.azura4k.mcpe.Payroll.Commands.JobOfferCmd;
 import com.azura4k.mcpe.Payroll.Commands.ManageCmd;
 import com.azura4k.mcpe.Payroll.Commands.PayToCmd;
 import com.azura4k.mcpe.Payroll.Commands.TimesheetCmd;
+import com.azura4k.mcpe.Payroll.Listeners.AutoClockOut;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,19 +24,14 @@ public class PayrollBase extends JavaPlugin {
     //For API
     PayRollAPI api;
 
-    private static Economy econ = null;
-    public static Economy getEconomy() {
-        return econ;
-    }
+
+
 
 
     @Override
     public void onLoad() {
         super.onLoad();
         getLogger().info("Starting Up");
-
-
-
         this.getCommand("manage").setExecutor(new ManageCmd());
         this.getCommand("timesheet").setExecutor(new TimesheetCmd());
         this.getCommand("joboffer").setExecutor(new JobOfferCmd());
@@ -49,10 +45,9 @@ public class PayrollBase extends JavaPlugin {
         super.onEnable();
         this.getLogger().info("Payroll has Loaded");
         PayRollAPI.Initialize(this);
-         api = new PayRollAPI();
+        api = new PayRollAPI();
         this.getServer().getPluginManager().registerEvents(new AutoClockOut(), this);
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        econ = rsp.getProvider();
+
 
 
 
@@ -74,10 +69,3 @@ public class PayrollBase extends JavaPlugin {
     }
 }
 
-class AutoClockOut implements Listener {
-    PayRollAPI api = new PayRollAPI();
-    @EventHandler
-    public void onDisconnect(PlayerQuitEvent event) {
-        api.ForceClockOut(event.getPlayer());
-    }
-}

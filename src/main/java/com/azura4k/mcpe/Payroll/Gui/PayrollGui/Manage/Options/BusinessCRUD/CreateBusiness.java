@@ -25,8 +25,8 @@ public class CreateBusiness {
         form.responseHandler((form, reponseData)->{
             CustomFormResponse response = form.parseResponse(reponseData);
             OfflinePlayer player2 = PayRollAPI.plugin.getServer().getOfflinePlayer(player.getUniqueId());
-            if (PayrollBase.getEconomy().getBalance(player2) >= StartupCost){
-                PayrollBase.getEconomy().withdrawPlayer(player2, StartupCost);
+            if (PayRollAPI.getEconomy().getBalance(player2) >= StartupCost){
+                PayRollAPI.getEconomy().withdrawPlayer(player2, StartupCost);
                 if (api.CreateBusiness(response.getInput(1), response.getInput(2), player)){
                     SelectMenu customForm = new SelectMenu();
                     customForm.initialize(player);

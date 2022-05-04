@@ -33,7 +33,7 @@ public class AcceptOrDenyJob {
             if (response.getResult()){
                 api.AcceptPosition(player, businessName);
             }else if (!response.getResult()){
-                api.DenyPosition(player, businessName);
+                api.DeleteJobOffer(player, businessName);
             }
 
         });

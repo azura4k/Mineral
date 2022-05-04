@@ -35,8 +35,8 @@ public class Business {
         //Check and see if Employee has rank to manage.
         if (Depositor.Rank > TrustedRank) {
             OfflinePlayer player = PayRollAPI.plugin.getServer().getOfflinePlayer(Depositor.playerUUID);
-            if (PayrollBase.getEconomy().getBalance(player) >= DepositValue) {
-                PayrollBase.getEconomy().withdrawPlayer(player, DepositValue);
+            if (PayRollAPI.getEconomy().getBalance(player) >= DepositValue) {
+                PayRollAPI.getEconomy().withdrawPlayer(player, DepositValue);
                 Balance += DepositValue;
                 SaveData();
                 return true;
@@ -55,7 +55,7 @@ public class Business {
         if (Withdrawal.Rank > TrustedRank) {
             OfflinePlayer player = PayRollAPI.plugin.getServer().getOfflinePlayer(Withdrawal.playerUUID);
             if (Balance >= WithdrawValue) {
-                PayrollBase.getEconomy().depositPlayer(player, WithdrawValue);
+                PayRollAPI.getEconomy().depositPlayer(player, WithdrawValue);
                 Balance -= WithdrawValue;
                 SaveData();
                 return true;

@@ -3,374 +3,550 @@ package com.azura4k.mcpe.Payroll;
 
 import com.azura4k.mcpe.Payroll.Models.Business;
 import com.azura4k.mcpe.Payroll.Models.Employee;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class PayRollAPI{
 
+    private static Economy econ = null;
     public static PayrollBase plugin;
-
-    //TODO REWRITE STORAGE TO SQLITE
-
-
-    private static FileConfiguration BusinessData;
-    private static FileConfiguration JobList;
-    private static FileConfiguration Clock;
     public static FileConfiguration PluginConfig;
-
-
-
-
-    public static void Initialize(PayrollBase instance) {
-        instance.saveResource("/data/business.yml", false);
-        BusinessData = new Config(instance.getDataFolder() + "/data/business.yml", Config.YAML);
-        instance.getLogger().info("Business Data YAML Ready.");
-
-        instance.saveResource("/data/joblist.yml", false);
-        JobList = new Config(instance.getDataFolder() + "/data/joblist.yml", Config.YAML);
-        instance.getLogger().info("Joblist Data YAML Ready.");
-
-        instance.saveResource("/data/clock.yml", false);
-        Clock = new Config(instance.getDataFolder() + "/data/clock.yml", Config.YAML);
-        instance.getLogger().info("Clock Data YAML Ready.");
-        PluginConfig = instance.getConfig();
-
-        plugin = instance;
+    static Connection Conn = null;
+    public static Economy getEconomy() {
+        return econ;
     }
+    public static void Initialize(PayrollBase instance) {
 
+        PluginConfig = instance.getConfig();
+        plugin = instance;
+
+        RegisteredServiceProvider<Economy> rsp = plugin.getServer().getServicesManager().getRegistration(Economy.class);
+        econ = rsp.getProvider();
+
+        File dataFile = new File(Objects.requireNonNull(plugin.getServer().getPluginManager().getPlugin("Payroll")).getDataFolder().getPath() + "// Corp.db");
+        try {
+            if (dataFile.createNewFile()){
+                plugin.getLogger().warning("New File Created");
+            } else {
+                plugin.getLogger().warning("Using Existing Data");
+            }
+        } catch (IOException e) {
+            plugin.getLogger().warning( e.getMessage());
+        }
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Conn = DriverManager.getConnection("jdbc:sqlite:" + dataFile.getAbsolutePath());
+            plugin.getLogger().info("Opened database successfully");
+
+        } catch ( Exception e ) {
+            plugin.getLogger().warning( e.getClass().getName() + ": " + e.getMessage() );
+        }
+
+        //Create Tables
+        String CompanyTableSQL =
+                "CREATE TABLE IF NOT EXISTS  \"Companies\" (\n" +
+                        "\t\"CompanyName\"\tTEXT NOT NULL UNIQUE,\n" +
+                        "\t\"CompanyDesc\"\tTEXT,\n" +
+                        "\t\"OwnerUUID\"\tTEXT NOT NULL,\n" +
+                        "\t\"CreationDate\"\tTEXT NOT NULL,\n" +
+                        "\t\"Balance\"\tNUMERIC NOT NULL,\n" +
+                        "\t\"TrustedRank\"\tINTEGER NOT NULL,\n" +
+                        "\t\"MaxRank\"\tINTEGER NOT NULL,\n" +
+                        "\t\"MinRank\"\tINTEGER NOT NULL,\n" +
+                        "\tPRIMARY KEY(\"Name\")\n" +
+                        ");";
+
+
+        String EmployeesDableSQL =
+                "CREATE TABLE IF NOT EXISTS  \"Employment\" (\n" +
+                        "\t\"PlayerUUID\"\tTEXT NOT NULL,\n" +
+                        "\t\"CompanyName\"\tINTEGER NOT NULL,\n" +
+                        "\t\"Title\"\tTEXT,\n" +
+                        "\t\"Wage\"\tREAL NOT NULL,\n" +
+                        "\t\"MinutesWorked\"\tREAL NOT NULL,\n" +
+                        "\t\"TotalTime\"\tNUMERIC NOT NULL,\n" +
+                        "\t\"MaxMinutes\"\tNUMERIC NOT NULL,\n" +
+                        "\t\"Rank\"\tINTEGER NOT NULL,\n" +
+                        "\t\"Fired\"\tINTEGER NOT NULL,\n" +
+                        "\t\"FiredDate\"\tTEXT NOT NULL,\n" +
+                        "\t\"StartDate\"\tTEXT NOT NULL,\n" +
+                        "\tPRIMARY KEY(\"CompanyUUID\",\"PlayerUUID\",\"CompanyName\")\n" +
+                        ");";
+
+        String JobOffersTableSQL =
+                "CREATE TABLE IF NOT EXISTS  \"JobOffers\" (\n" +
+                        "\t\"CompanyName\"\tTEXT NOT NULL,\n" +
+                        "\t\"PlayerUUID\"\tTEXT NOT NULL,\n" +
+                        "\t\"OfferedWage\"\tINTEGER NOT NULL,\n" +
+                        "\t\"OfferedTitle\"\tTEXT NOT NULL,\n" +
+                        "\t\"MaxMinutes\"\tNumeric NOT NULL,\n" +
+                        //Good for later (Job Desc)
+                        "\t\"JobDesc\"\tTEXT,\n" +
+                        "\t\"OfferedRank\"\tNumeric NOT NULL,\n" +
+                        "\tPRIMARY KEY(\"PlayerUUID\",\"CompanyName\")\n" +
+                        ");";
+
+        String ClockTableSQL =
+                "CREATE TABLE IF NOT EXISTS  \"Clock\" (\n" +
+                        "\t\"ClockInTime\"\tNUMERIC NOT NULL,\n" +
+                        "\t\"PlayerUUID\"\tTEXT NOT NULL UNIQUE,\n" +
+                        "\t\"MaxMinutes\"\tNUMERIC NOT NULL,\n" +
+                        "\t\"CompanyName\"\tTEXT NOT NULL,\n" +
+                        "\tPRIMARY KEY(\"PlayerUUID\",\"CompanyName\",\"CompanyUUID\")\n" +
+                        ");";
+
+        try {
+            Conn.createStatement().execute(CompanyTableSQL);
+            Conn.createStatement().execute(EmployeesDableSQL);
+            Conn.createStatement().execute(JobOffersTableSQL);
+            Conn.createStatement().execute(ClockTableSQL);
+            Conn.commit();
+        }
+        catch (Exception e){
+            plugin.getLogger().info("Just something under the hood");
+        }
+
+
+    }
 
 
     public boolean CreateBusiness(String businessName, String businessDesc, Player owner) {
 
-        if (NameNotTook(businessName)) {
-            BusinessData.set(businessName + ".name", businessName);
-            BusinessData.set(businessName + ".desc", businessDesc);
-            BusinessData.set(businessName + ".ownerName", owner.getName());
-            BusinessData.set(businessName + ".creationdate", getDate());
-            BusinessData.set(businessName + ".balance", (double) 0);
-            BusinessData.set(businessName + ".trustedrank", 4);
-            BusinessData.set(businessName + ".maxrank", 5);
-            BusinessData.set(businessName + ".minrank", 1);
-            BusinessData.save();
-            BusinessData.reload();
+        String sql = "INSERT INTO Companies VALUES(?,?,?,?,?,?)";
 
-            //Load Owner as Employee
-            HireOwner(businessName, owner, "Founder", 20, 5, PluginConfig.getDouble("MinimumWage"));
-
-            return true;
+        try{
+            PreparedStatement pstmt = Conn.prepareStatement(sql);
+            pstmt.setString(1, businessName);
+            pstmt.setString(2, businessDesc);
+            pstmt.setString(3, owner.getUniqueId().toString());
+            pstmt.setString(4, getDate().toString());
+            pstmt.setDouble(5,0.0);
+            pstmt.setInt(6, 4);
+            pstmt.setInt(7, 5);
+            pstmt.setInt(8, 1);
+            pstmt.executeUpdate();
+            if (HireOwner(businessName, owner, "Founder", 20, 5, PluginConfig.getDouble("MinimumWage"))){
+                return true;
+            }
+        }catch (SQLException e){
+            plugin.getLogger().warning("Company Already Exists");
+            return false;
         }
         return false;
     }
     public void DeleteBusiness(Business business, Player commandeer) {
         try {
             if (commandeer == business.Owner || commandeer.isOp()) {
-                BusinessData.remove(business.BusinessName);
-                BusinessData.save();
-                BusinessData.reload();
+                String sql = "DELETE FROM Companies WHERE CompanyName = ? AND OwnerUUID = ?";
+                PreparedStatement statement = Conn.prepareStatement(sql);
+                statement.setString(1, business.BusinessName);
+                statement.setString(2, commandeer.getUniqueId().toString());
+                statement.executeUpdate();
             }
-        } catch (Exception ignored){
+        } catch (Exception e){
+            plugin.getLogger().warning(e.getMessage());
         }
     }
     public static void SaveNewBusinessData(Business business) {
-        BusinessData.reload();
-        BusinessData.set(business.BusinessName  + ".desc", business.BusinessDesc);
-        BusinessData.set(business.BusinessName  + ".ownerName", business.Owner.getName());
-        BusinessData.set(business.BusinessName  + ".balance", business.Balance);
-        BusinessData.set(business.BusinessName  + ".trustedrank", business.TrustedRank);
-        BusinessData.set(business.BusinessName  + ".maxrank", business.MaxRank);
-        BusinessData.set(business.BusinessName  + ".minrank", business.MinRank);
-        BusinessData.save();
-        BusinessData.reload();
+        try {
+            String sql = "UPDATE Companies SET CompanyDesc = ?, Balance = ?, TrustedRank = ?, MaxRank = ?, MinRank = ? WHERE CompanyName = ?";
+            PreparedStatement statement = Conn.prepareStatement(sql);
+            statement.setString(1, business.BusinessDesc);
+            statement.setDouble(2, business.Balance);
+            statement.setInt(3, business.TrustedRank);
+            statement.setInt(4, business.MaxRank);
+            statement.setInt(5, business.MinRank);
+            statement.setString(6, business.BusinessName);
+            statement.executeUpdate();
+        }catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
+        }
+
+
     }
     public Business LoadBusiness(String businessName){
         Business business = new Business();
-        if (BusinessData.exists(businessName, true)){
-            business.BusinessName = BusinessData.get(businessName + ".name").toString();
-            business.BusinessDesc = BusinessData.get(businessName + ".desc").toString();
-            business.CreationDate = BusinessData.get(businessName + ".creationdate").toString();
-            business.Owner = plugin.getServer().getPlayerExact(BusinessData.get(businessName + ".ownerName").toString());
-            business.Balance = (double) BusinessData.get(businessName + ".balance");
-            business.TrustedRank = (int) BusinessData.get(businessName + ".trustedrank");
-            business.MaxRank = (int) BusinessData.get(businessName + ".maxrank");
-            business.MinRank = (int) BusinessData.get(businessName + ".minrank");
 
-            try {
-                Set<String> Employees = BusinessData.getSection(businessName + ".employees").getKeys(false);
+        try {
+            String sql = "SELECT * FROM Companies WHERE CompanyName = ?";
+            PreparedStatement stmt = Conn.prepareStatement(sql);
+            stmt.setString(1, businessName);
 
-                for (String EmployeeName : Employees) {
-                    String key = businessName + ".employees." + EmployeeName.toLowerCase();
-                    Employee employee = new Employee();
-                    employee.EmployerName = business.BusinessName;
-                    employee.playerUUID = UUID.fromString(BusinessData.getString(key + ".PlayerUUID"));
-                    employee.PlayerName = BusinessData.getString(key + ".PlayerName");
-                    employee.StartDate = BusinessData.getString(key + ".StartDate");
-                    employee.Title = BusinessData.getString(key + ".Title");
-                    employee.MaximumMinutes = BusinessData.getDouble(key + ".MaxHrs");
-                    employee.Rank = BusinessData.getInt(key + ".Rank");
-                    employee.Wage = BusinessData.getDouble(key + ".Wage");
-                    employee.Fired = BusinessData.getBoolean(key + ".Fired");
-                    employee.FiredDate = BusinessData.getString(key + ".FiredDate");
-                    employee.MinutesWorkedPerPayPeriod = BusinessData.getDouble(key + ".MinutesWorked");
-                    employee.TotalWorkMinutes = BusinessData.getDouble(key + ".TotalMinutesWorked");
-                    business.Employees.add(employee);
-                }
-            }
-            catch (Exception ignored){}
+            //Get Results
+            ResultSet results = stmt.executeQuery();
+
+
+            //Assign Results to variables
+            business.BusinessName = results.getString("CompanyName");
+            business.BusinessDesc = results.getString("CompanyDesc");
+            business.Balance = results.getDouble("Balance");
+            business.MinRank = results.getInt("MinRank");
+            business.MaxRank = results.getInt("MaxRank");
+            business.Owner = plugin.getServer().getPlayer(UUID.fromString(results.getString("OwnerUUID")));
+            business.TrustedRank = results.getInt("TrustedRank");
+            business.CreationDate = results.getString("CreationDate");
+
+            business.Employees = getAllEmployeesEmployedHere(businessName);
+
+
             return business;
+        }catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
+            return null;
         }
-        else {
+
+    }
+    protected ArrayList<Employee> getAllEmployeesEmployedHere(String businessName) {
+        try {
+            ArrayList<Employee> Employees = new ArrayList<>();
+            String sql = "SELECT * FROM Employment WHERE CompanyName = ? AND ";
+            PreparedStatement stmt = Conn.prepareStatement(sql);
+            stmt.setString(1, businessName);
+
+            //Get Results
+            ResultSet results = stmt.executeQuery();
+            while(results.next()) {
+                Employee employee = new Employee();
+                employee.EmployerName = businessName;
+                employee.playerUUID = UUID.fromString(results.getString("PlayerUUID"));
+                employee.Rank = results.getInt("Rank");
+                employee.PlayerName = plugin.getServer().getPlayer(employee.playerUUID).getName();
+                employee.Fired = results.getBoolean("Fired");
+                employee.FiredDate = results.getString("FiredDate");
+                employee.MinutesWorkedPerPayPeriod = results.getDouble("MinutesWorked");
+                employee.MaximumMinutes = results.getDouble("MaxMinutes");
+                employee.TotalWorkMinutes = results.getDouble("TotalTime");
+                employee.Wage = results.getDouble("Wage");
+                employee.StartDate = results.getString("StartDate");
+                Employees.add(employee);
+            }
+            return Employees;
+        }
+        catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
             return null;
         }
     }
     public void TransferOwner(Player player, Business business, String newOwnerName) {
         try {
+            Player newOwner = plugin.getServer().getPlayerExact(newOwnerName);
+            PreparedStatement stmt = Conn.prepareStatement("UPDATE Companies SET OwnerUUID = ? WHERE OwnerUUID = ? AND CompanyName = ?");
+            stmt.setString(1, newOwner.getUniqueId().toString());
+            stmt.setString(2, player.getUniqueId().toString());
+            stmt.setString(3, business.BusinessName);
 
-            String key = business.BusinessName + ".ownerName";
-            BusinessData.set(key, newOwnerName);
-            HireOwner(business.BusinessName, plugin.getServer().getPlayerExact(newOwnerName), "New Owner", 20, business.MaxRank, 20);
+            HireOwner(business.BusinessName, newOwner, "New Owner", 20, business.MaxRank, 20);
             Employee OldOwner = LoadEmployee(business, player.getName());
             OldOwner.Rank = business.MaxRank - 1;
-
+            OldOwner.SaveData();
         }
-        catch (Exception ignored){}
+        catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
+        }
 
     }
+
+
     public void OfferPosition(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
-        //If business data does not exist
         try {
-            String key2 = player.getUniqueId().toString() + "." + businessName;
-            String key = businessName + ".employees." + player.getName().toLowerCase();
-            if (!BusinessData.exists(key, true)) {
-                JobList.set(key2 + ".Name", player.getUniqueId().toString());
-                JobList.set(key2 + ".PlayerUUID", player.getUniqueId().toString());
-                JobList.set(key2 + ".StartDate", getDate());
-                JobList.set(key2 + ".Title", title);
-                JobList.set(key2 + ".PlayerName", player.getName());
-                JobList.set(key2 + ".MaxHrs", MaxMinutes);
-                JobList.set(key2 + ".Rank", rank);
-                JobList.set(key2 + ".Wage", wage);
-                JobList.set(key2 + ".Fired", false);
-                JobList.set(key2 + ".FiredDate", "null");
-                JobList.set(key2 + ".MinutesWorked", 0.0);
-                JobList.set(key2 + ".TotalMinutesWorked", 0.0);
-                JobList.save();
-                JobList.reload();
-            }
+            PreparedStatement stmt = Conn.prepareStatement("INSERT INTO JobOffers VALUES (?,?,?,?,?,?,?)");
+            stmt.setString(1,businessName);
+            stmt.setString(2,player.getUniqueId().toString());
+            stmt.setDouble(3, wage);
+            stmt.setString(4, title);
+            stmt.setDouble(5, MaxMinutes);
+            stmt.setString(6, "");
+            stmt.setInt(7, rank);
+            stmt.executeUpdate();
+        } catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
         }
-        catch (Exception ignored){}
     }
     public void AcceptPosition(Player player, String businessName){
-        String key = player.getUniqueId().toString() + "." + businessName;
-
-        HireEmployee(businessName, player,JobList.getString(key + ".Title"),  JobList.getDouble(key + ".MaxHrs"),JobList.getInt(key + ".Rank") ,JobList.getDouble(key + ".Wage"));
-
-        JobList.getSection(player.getUniqueId().toString()).remove(businessName);
-        JobList.save();
-        JobList.reload();
+        Employee employee = LoadPositionDetails(player, businessName);
+        HireEmployee(businessName, player, employee.Title, employee.MaximumMinutes, employee.Rank, employee.Wage);
+        DeleteJobOffer(player, businessName);
     }
-    public void DenyPosition(Player player, String businessName){
-        JobList.getSection(player.getUniqueId().toString()).remove(businessName);
-        JobList.save();
-        JobList.reload();
+    public void DeleteJobOffer(Player player, String businessName){
+        try {
+            PreparedStatement stmt = Conn.prepareStatement("DELETE FROM JobOffers WHERE PlayerUUID = ? AND CompanyName = ? ");
+            stmt.setString(1, player.getUniqueId().toString());
+            stmt.setString(2, businessName);
+        }catch(SQLException e){
+            plugin.getLogger().warning(e.getMessage());
+        }
     }
     public Employee LoadPositionDetails(Player player, String businessName){
         Employee employee = new Employee();
-        String key = player.getUniqueId().toString() + "." + businessName;
+        try {
+            PreparedStatement stmt = Conn.prepareStatement("SELECT * FROM JobOffers WHERE PlayerUUID = ? AND CompanyName = ?");
+            stmt.setString(1, player.getUniqueId().toString());
+            ResultSet results = stmt.executeQuery();
 
-        employee.EmployerName = JobList.getString(key + ".Name");
-        employee.playerUUID = UUID.fromString(JobList.getString(key + ".PlayerUUID"));
-        employee.Title = JobList.getString(key + ".Title");
-        employee.PlayerName = JobList.getString(key + ".PlayerName");
-        employee.MaximumMinutes = JobList.getDouble(key + ".MaxHrs");
-        employee.Rank = JobList.getInt(key + ".Rank");
-        employee.Wage = JobList.getDouble(key + ".Wage");
-
-        return employee;
-    }
-    public ArrayList<String> getAllJobOffers(Player player) {
-        JobList.reload();
-        Set<String> Businesses =  JobList.getSections(player.getUniqueId().toString()).getKeys(false);
-        return new ArrayList<>(Businesses);
-    }
-    public void HireEmployee(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
-        String key = businessName + ".employees." + player.getName().toLowerCase();
-        if (!BusinessData.exists(key, true)){
-            BusinessData.set(key + ".PlayerUUID", player.getUniqueId().toString());
-            BusinessData.set(key + ".StartDate", getDate());
-            BusinessData.set(key + ".Title", title);
-            BusinessData.set(key + ".PlayerName", player.getName());
-            BusinessData.set(key + ".MaxHrs", MaxMinutes);
-            BusinessData.set(key + ".Rank", rank);
-            BusinessData.set(key + ".Wage", wage);
-            BusinessData.set(key + ".Fired", false);
-            BusinessData.set(key + ".FiredDate", "null");
-            BusinessData.set(key + ".MinutesWorked", 0.0);
-            BusinessData.set(key + ".TotalMinutesWorked", 0.0);
-            BusinessData.save();
-
-            JobList.remove(player.getUniqueId().toString() + "." + businessName);
-        }
-    }
-    public void HireOwner(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
-        //If business data does not exist
-        String key = businessName + ".employees." + player.getName().toLowerCase();
-        if (!BusinessData.exists(key, true)){
-            BusinessData.set( key + ".PlayerUUID", player.getUniqueId().toString());
-            BusinessData.set(key + ".StartDate", getDate());
-            BusinessData.set(key + ".Title", title);
-            BusinessData.set(key + ".PlayerName", player.getName());
-            BusinessData.set(key + ".MaxHrs", MaxMinutes);
-            BusinessData.set(key+ ".Rank", rank);
-            BusinessData.set(key + ".Wage", wage);
-            BusinessData.set(key + ".Fired", false);
-            BusinessData.set(key + ".FiredDate", "null");
-            BusinessData.set(key + ".MinutesWorked", 0.0);
-            BusinessData.set(key + ".TotalMinutesWorked", 0.0);
-            BusinessData.save();
-        }
-    }
-    public void FireEmployee(Employee employee){
-            BusinessData.getSection(employee.EmployerName).getSection("employees").remove(employee.PlayerName);
-            BusinessData.save();
-            BusinessData.reload();
-    }
-    public Employee LoadEmployee(Business business, String EmployeeName){
-        String key = business.BusinessName + ".employees." + EmployeeName.toLowerCase();
-        Employee employee = new Employee();
-        //Check for Employment
-        if (BusinessData.exists(key, true)){
-            employee.EmployerName = business.BusinessName;
-            employee.playerUUID = UUID.fromString(BusinessData.getString(key+ ".PlayerUUID"));
-            employee.PlayerName = BusinessData.getString(key+ ".PlayerName");
-            employee.StartDate = BusinessData.getString(key +".StartDate");
-            employee.Title = BusinessData.getString(key + ".Title");
-            employee.MaximumMinutes = BusinessData.getDouble(key + ".MaxHrs");
-            employee.Rank = BusinessData.getInt(key + ".Rank");
-            employee.Wage = BusinessData.getDouble(key + ".Wage");
-            employee.Fired = BusinessData.getBoolean(key + ".Fired");
-            employee.FiredDate = BusinessData.getString(key + ".FiredDate");
-            employee.MinutesWorkedPerPayPeriod = BusinessData.getDouble(key + ".MinutesWorked");
-            employee.TotalWorkMinutes = BusinessData.getDouble(key + ".TotalMinutesWorked");
+            employee.EmployerName = businessName;
+            employee.Wage = results.getDouble("OfferedWage");
+            employee.playerUUID = UUID.fromString(results.getString("PlayerUUID"));
+            employee.Title = results.getString("OfferedTitle");
+            employee.MaximumMinutes = results.getDouble("MaxMinutes");
+            employee.Rank = results.getInt("OfferedRank");
             return employee;
+        }catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
         }
         return null;
     }
+    public ArrayList<String> getAllJobOffers(Player player) {
+
+        ArrayList<String> Businesses = new ArrayList<>();
+        try {
+            PreparedStatement stmt = Conn.prepareStatement("SELECT CompanyName FROM JobOffers WHERE PlayerUUID = ?");
+            stmt.setString(1, player.getUniqueId().toString());
+            ResultSet results = stmt.executeQuery();
+            while (results.next()){
+                Businesses.add(results.getString("CompanyName"));
+            }
+            return new ArrayList<>(Businesses);
+        }
+        catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
+        }
+        return null;
+    }
+
+
+    public void HireEmployee(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
+        try{
+            //Check for current employment at company
+            PreparedStatement checkFor = Conn.prepareStatement("SELECT CompanyName, PlayerUUID FROM Employment WHERE PlayerUUID = ? AND CompanyName = ?;");
+            checkFor.setString(1, player.getUniqueId().toString());
+            checkFor.setString(2, businessName);
+
+            if (!checkFor.executeQuery().isBeforeFirst()){
+                String sql = "INSERT INTO Employment VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+                PreparedStatement pstmt = Conn.prepareStatement(sql);
+                pstmt.setString(1, player.getUniqueId().toString().toLowerCase());
+                pstmt.setString(2, businessName);
+                pstmt.setString(3, title);
+                pstmt.setDouble(4, wage);
+                pstmt.setDouble(5, 0);
+                pstmt.setDouble(6, 0);
+                pstmt.setDouble(7, MaxMinutes);
+                pstmt.setDouble(8, rank);
+                pstmt.setInt(9, 0);
+                pstmt.setString(10, "");
+                pstmt.setString(11, getDate().toString());
+                pstmt.executeUpdate();
+                //TODO REMOVE JOB FROM JOB LISTING
+            }
+        }catch (SQLException e) {
+            player.sendMessage(e.getMessage());
+        }
+    }
+    public boolean HireOwner(String businessName, Player player, String title, double MaxMinutes, int rank, double wage){
+        try{
+                String sql = "INSERT INTO Employment VALUES (?,?,?,?,?,?,?,?,?,?);";
+                PreparedStatement pstmt = Conn.prepareStatement(sql);
+                pstmt.setString(1, player.getUniqueId().toString().toLowerCase());
+                pstmt.setString(2, businessName);
+                pstmt.setString(3, title);
+                pstmt.setDouble(4, wage);
+                pstmt.setDouble(5, 0);
+                pstmt.setDouble(6, 0);
+                pstmt.setDouble(7, MaxMinutes);
+                pstmt.setDouble(8, rank);
+                pstmt.setInt(9, 0);
+                pstmt.setString(10, "");
+                pstmt.executeUpdate();
+                return true;
+        }catch (SQLException e) {
+            player.sendMessage(e.getMessage());
+            return false;
+        }
+
+    }
+    public void FireEmployee(Employee employee){
+        String sql = "DELETE FROM Employment WHERE CompanyName = ? AND PlayerUUID = ?;";
+        try {
+            PreparedStatement pstmt = Conn.prepareStatement(sql);
+            pstmt.setString(1,employee.EmployerName);
+            pstmt.setString(2,employee.playerUUID.toString());
+        }
+        catch (SQLException e) {
+            plugin.getLogger().warning(e.getMessage());
+        }
+    }
+
+
+    public Employee LoadEmployee(Business business, String PlayerName){
+        try {
+            String sql = "SELECT * FROM Employment WHERE CompanyName = ? AND PlayerUUID = ?";
+            PreparedStatement stmt = Conn.prepareStatement(sql);
+            stmt.setString(1, business.BusinessName);
+            stmt.setString(2, plugin.getServer().getPlayer(PlayerName).getUniqueId().toString());
+            ResultSet results = stmt.executeQuery();
+
+            Employee employee = new Employee();
+            employee.EmployerName = business.BusinessName;
+            employee.playerUUID = UUID.fromString(results.getString("PlayerUUID"));
+            employee.Rank = results.getInt("Rank");
+            employee.PlayerName = plugin.getServer().getPlayer(employee.playerUUID).getName();
+            employee.Fired = results.getBoolean("Fired");
+            employee.FiredDate = results.getString("FiredDate");
+            employee.MinutesWorkedPerPayPeriod = results.getDouble("MinutesWorked");
+            employee.MaximumMinutes = results.getDouble("MaxMinutes");
+            employee.TotalWorkMinutes = results.getDouble("TotalTime");
+            employee.Wage = results.getDouble("Wage");
+            employee.StartDate = results.getString("StartDate");
+            return employee;
+
+        } catch (SQLException e) {
+            plugin.getLogger().warning(e.getStackTrace().toString());
+        }
+
+
+
+        return null;
+    }
     public static void SaveNewEmployeeData(Employee employee) {
-        String key = employee.EmployerName + ".employees." + employee.PlayerName;
-        if (BusinessData.exists(key, true)){
-            BusinessData.reload();
-            BusinessData.set(key + ".Title", employee.Title);
-            BusinessData.set(key + ".MaxHrs", employee.MaximumMinutes);
-            BusinessData.set(key+ ".Rank", employee.Rank);
-            BusinessData.set(key + ".Wage", employee.Wage);
-            BusinessData.set(key + ".Fired", employee.Fired);
-            BusinessData.set(key + ".FiredDate", employee.FiredDate);
-            BusinessData.set(key + ".MinutesWorked",employee.MinutesWorkedPerPayPeriod);
-            BusinessData.set(key + ".TotalMinutesWorked", employee.TotalWorkMinutes);
-            BusinessData.save();
-            BusinessData.reload();
+        try {
+            String sql = "UPDATE Employment SET Title = ?, Wage = ?, MinutesWorked = ?, TotalTime = ?, MaxMinutes = ?, Rank = ?, Fired = ?, FiredDate = ? WHERE PlayerUUID = ?";
+            PreparedStatement statement = Conn.prepareStatement(sql);
+            statement.setString(1, employee.Title);
+            statement.setDouble(2, employee.Wage);
+            statement.setDouble(3, employee.MinutesWorkedPerPayPeriod );
+            statement.setDouble(4, employee.TotalWorkMinutes);
+            statement.setDouble(5, employee.MaximumMinutes);
+            statement.setInt(6, employee.Rank);
+            statement.setBoolean(7, employee.Fired);
+            statement.setString(8, employee.FiredDate);
+            statement.setString(9, employee.playerUUID.toString());
+            statement.executeUpdate();
+        }catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
         }
     }
     public ArrayList<String> getBusinessesEmployedAt(Player player){
 
         ArrayList<String> EmployedBusinesses = new ArrayList<>();
-        BusinessData.reload();
-        for (String s : BusinessData.getKeys(false)) {
-            Business business = LoadBusiness(s);
-            for (int i = 0; i < business.Employees.size(); i++) {
-                if (Objects.equals(business.Employees.get(i).playerUUID, player.getUniqueId())) {
-                    EmployedBusinesses.add(s);
-                }
+
+        try {
+            PreparedStatement stmt = Conn.prepareStatement("SELECT CompanyName FROM Employment WHERE PlayerUUID = ?");
+            stmt.setString(1, player.getUniqueId().toString());
+            ResultSet results = stmt.executeQuery();
+            while(results.next()){
+                EmployedBusinesses.add(results.getString("CompanyName"));
             }
+        }catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
         }
         return EmployedBusinesses;
     }
-
     public void PayEmployeeMinutelyRate(Employee employee){
         double TimeWorked = employee.MinutesWorkedPerPayPeriod;
         double Tax;
         Tax = plugin.getConfig().getDouble("TaxPercent");
         Double Income = TimeWorked * employee.Wage;
         Double TaxSubtraction = Income * Tax;
-
-        LlamaEconomy.getAPI().addMoney(employee.playerUUID, Income - TaxSubtraction);
-
+        getEconomy().depositPlayer(plugin.getServer().getOfflinePlayer(employee.playerUUID), Income - TaxSubtraction);
         plugin.getServer().getPlayerExact(employee.PlayerName).sendMessage(getLanguage("PayOutEmployee") + (Income - TaxSubtraction) + getLanguage("PayOutEmployeeBusiness") + employee.EmployerName);
-
-
         Business Employer = LoadBusiness(employee.EmployerName);
         Employer.Balance -= Income - TaxSubtraction;
         employee.MinutesWorkedPerPayPeriod = 0.0;
         Employer.SaveData();
         employee.SaveData();
     }
-
     public void RegisterOnClock(Player player, Employee employee) {
-        String Key = employee.PlayerName.toLowerCase();
-        if (!Clock.isSection(Key) && LoadBusiness(employee.EmployerName).Balance > 0) {
-            Clock.set(Key + ".ClockInTime", getTime());
-            Clock.set(Key + ".MaxMinutes", employee.MaximumMinutes);
-            Clock.set(Key + ".BusinessName", employee.EmployerName);
-            Clock.save();
-            Clock.reload();
-        }
-        else {
+        try{
+            PreparedStatement statement = Conn.prepareStatement("INSERT INTO Clock VALUES (?,?,?,?)");
+            statement.setLong(1, getTime());
+            statement.setString(2, employee.playerUUID.toString());
+            statement.setDouble(3, employee.MaximumMinutes);
+            statement.setString(4, employee.EmployerName);
+            statement.executeUpdate();
+        } catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
             player.sendMessage(getLanguage("CannotClockInOrInDebt"));
         }
     }
     public void RegisterOffClock(Employee employee) {
-        String Key = employee.PlayerName.toLowerCase();
-        if (Clock.isSection(Key)) {
-            long ClockInTime = Clock.getLong(Key + ".ClockInTime");
+
+        try{
+            PreparedStatement statement = Conn.prepareStatement("SELECT * FROM Clock WHERE PlayerUUID = ?");
+            statement.setString(1, employee.playerUUID.toString());
+            ResultSet rs = statement.executeQuery();
+
+            //Get Data and calculate
+            long ClockInTime = rs.getLong("ClockInTime");
             long Difference = TimeUnit.MILLISECONDS.toMinutes(Math.abs(getTime() - ClockInTime ));
             employee.MinutesWorkedPerPayPeriod += Difference;
             employee.TotalWorkMinutes += Difference;
             employee.SaveData();
-            Clock.remove(employee.PlayerName);
-            Clock.save();
-            Clock.reload();
+
+            //Delete From Record
+            PreparedStatement stmt = Conn.prepareStatement("DELETE FROM Clock WHERE PlayerUUID = ?");
+            stmt.setString(1, employee.playerUUID.toString());
+            stmt.executeUpdate();
+
         }
-        else{plugin.getServer().getPlayerExact(employee.PlayerName).sendMessage(getLanguage("NotClockedIn"));}
+        catch (SQLException e){
+            plugin.getServer().getPlayerExact(employee.PlayerName).sendMessage(getLanguage("NotClockedIn"));
+        }
     }
 
-    public void ForceClockOut(Player player) {
-        String Key0 = player.getName().toLowerCase();
-        String Key1 = player.getName().toLowerCase() + ".ClockInTime";
-        String Key2 = player.getName().toLowerCase()  + ".BusinessName";
 
-        if (Clock.isSection(Key0)) {
-            long ClockInTime = Clock.getLong(Key1);
-            String BusinessName = Clock.getString(Key2);
-            long Difference = TimeUnit.MILLISECONDS.toMinutes(Math.abs(getTime() - ClockInTime ));
-            Employee employee = LoadEmployee(LoadBusiness(BusinessName), player.getName());
-            employee.MinutesWorkedPerPayPeriod += Difference;
-            employee.TotalWorkMinutes += Difference;
-            employee.SaveData();
-            Clock.remove(employee.PlayerName);
-            Clock.save();
-            Clock.reload();
-        }
+
+    public void ForceClockOut(Player player) {
+            try {
+                PreparedStatement statement = Conn.prepareStatement("SELECT * FROM Clock WHERE PlayerUUID = ?");
+                statement.setString(1, player.getUniqueId().toString());
+                ResultSet rs = statement.executeQuery();
+
+                long ClockInTime = rs.getLong("ClockInTime");
+                String BusinessName = rs.getString("CompanyName");
+
+                long Difference = TimeUnit.MILLISECONDS.toMinutes(Math.abs(getTime() - ClockInTime ));
+                Employee employee = LoadEmployee(LoadBusiness(BusinessName), player.getName());
+                employee.MinutesWorkedPerPayPeriod += Difference;
+                employee.TotalWorkMinutes += Difference;
+                employee.SaveData();
+
+                PreparedStatement stmt = Conn.prepareStatement("DELETE FROM Clock WHERE PlayerUUID = ?");
+                stmt.setString(1, player.getUniqueId().toString());
+                stmt.executeUpdate();
+
+            }catch (SQLException e){
+                plugin.getLogger().warning(e.getMessage());
+            }
     }
 
     public void windDownTimer() {
-        for (String PlayerName: Clock.getKeys(false)) {
-                String Key1 = PlayerName.toLowerCase() + ".ClockInTime";
-                String Key2 = PlayerName.toLowerCase() + ".MaxMinutes";
-                String Key3 = PlayerName.toLowerCase() + ".BusinessName";
-
-                long ClockInTime = Clock.getLong(Key1);
-                long MaxTime = TimeUnit.MINUTES.toMillis((long) Clock.getDouble(Key2));
+        try {
+            PreparedStatement statement = Conn.prepareStatement("SELECT * FROM Clock");
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                long ClockInTime = rs.getLong("ClockInTime");
+                long MaxTime = TimeUnit.MINUTES.toMillis(rs.getLong("MaxMinutes"));
                 long Difference = getTime() - ClockInTime;
-
+                String CompanyName = rs.getString("CompanyName");
+                Player player = plugin.getServer().getPlayer(UUID.fromString(rs.getString("PlayerUUID")));
                 if (Difference > MaxTime) {
-                    Business business = LoadBusiness(Clock.getString(Key3));
-                    RegisterOffClock(LoadEmployee(business, PlayerName));
-                    plugin.getServer().getPlayerExact(PlayerName).sendMessage(getLanguage("ForceClockOut"));
+                    Business business = LoadBusiness(CompanyName);
+                    RegisterOffClock(LoadEmployee(business, player.getName()));
+                    player.sendMessage(getLanguage("ForceClockOut"));
                 }
+            }
 
+        }catch (SQLException e){
+            plugin.getLogger().warning(e.getMessage());
         }
     }
 
@@ -386,24 +562,11 @@ public class PayRollAPI{
     public static Date getDate() {
         return new Date();
     }
-
     public static long getTime(){
         Calendar calendar = Calendar.getInstance();
         return calendar.getTimeInMillis();
     }
-
-    public static boolean NameNotTook(String Name){
-       if (!BusinessData.exists(Name.toLowerCase(),true) && !Name.contains(".")){
-           return Name.length() > 0;
-       }
-       else {
-           return false;
-       }
-    }
-
     public static String getLanguage(String LanugageTag){
         return PluginConfig.getString("Language." + LanugageTag);
     }
-
-
 }

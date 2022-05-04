@@ -1,6 +1,5 @@
 package com.azura4k.mcpe.Payroll.Commands;
 
-i
 import com.azura4k.mcpe.Payroll.Gui.PayrollGui.JobOffer.OfferMenu;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

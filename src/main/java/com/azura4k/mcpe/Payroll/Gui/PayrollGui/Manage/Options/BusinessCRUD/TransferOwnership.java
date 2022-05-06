@@ -18,9 +18,14 @@ public class TransferOwnership {
         if (Objects.equals(player, business.Owner)){
             form.input(PayRollAPI.getLanguage("TransferOwnershipTextBoxName"));
             form.responseHandler((form, responseData) -> {
+                try{
+                if (!form.isClosed(responseData)){
                 CustomFormResponse response = form.parseResponse(responseData);
-                if (response.getInput(1) != null && response.getInput(1).length() > 0 ){
-                    api.TransferOwner(player, business,response.getInput(1));
+                if (response.getInput(0) != null && response.getInput(0).length() > 0 ) {
+                    api.TransferOwner(player, business, response.getInput(0));
+                }
+                }}catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
                 }
             });
 

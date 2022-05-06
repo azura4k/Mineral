@@ -15,21 +15,20 @@ import java.util.Objects;
 public class BusinessInfo {
 
     public void initialize(Player player, Business business){
-        CustomForm.Builder Form =  CustomForm.builder();
+        CustomForm.Builder Form = CustomForm.builder();
         PayRollAPI api = new PayRollAPI();
         Employee employee = api.LoadEmployee(business, player.getName());
 
         Form.title(PayRollAPI.getLanguage("ManageBusinessInfoFormTitle"));
-        //Checks if Player is Owner
-        if (Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
+        if (Objects.equals(employee.playerUUID, business.Owner.getUniqueId())){
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormNameBelowOwner"), business.BusinessName);
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc"),business.BusinessDesc);
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormMaxRank"), String.valueOf(business.MaxRank));
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormMin"),String.valueOf(business.MinRank));
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormTrustedRank"),String.valueOf(business.TrustedRank));
-            Form.label(PayRollAPI.getLanguage(PayRollAPI.getLanguage("ManageBusinessInfoFormBalance") + business.Balance));
+            Form.label(PayRollAPI.getLanguage("ManageBusinessInfoFormBalance") + business.Balance);
         }
-        else if (employee.Rank >= business.TrustedRank && !Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
+        else if (employee.Rank >= business.TrustedRank && !Objects.equals(employee.playerUUID, business.Owner.getUniqueId())){
             Form.label(PayRollAPI.getLanguage("ManageBusinessInfoFormNameBelowOwner") + business.BusinessName);
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc"),business.BusinessDesc);
             Form.input(PayRollAPI.getLanguage("ManageBusinessInfoFormMaxRank"), String.valueOf(business.MaxRank));
@@ -42,50 +41,58 @@ public class BusinessInfo {
             Form.label(PayRollAPI.getLanguage("ManageBusinessInfoFormDesc") + business.MinRank);
         }
 
-        //Changes Handler.
         Form.responseHandler((form, responseData) -> {
-            CustomFormResponse response = form.parseResponse(responseData);
-            //Check for null
+            if (!form.isClosed(responseData)) {
+                try{
+                CustomFormResponse response = form.parseResponse(responseData);
+                //Check for null
+                if (Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())) {
 
-            if (Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
+                    if (!(response.getInput(1) == null) && Objects.requireNonNull(response.getInput(1)).length() > 0) {
+                        business.BusinessDesc = response.getInput(1);
+                    }
 
-                if (!(response.getInput(1) == null) && response.getInput(1).length() > 0){
-                    business.BusinessDesc = response.getInput(1);
+                    if (!(response.getInput(2) == null) && Objects.requireNonNull(response.getInput(2)).length() > 0) {
+                        business.MaxRank = Integer.parseInt(Objects.requireNonNull(response.getInput(2)));
+                    }
+                    if (!(response.getInput(3) == null) && Objects.requireNonNull(response.getInput(3)).length() > 0) {
+                        business.MinRank = Integer.parseInt(Objects.requireNonNull(response.getInput(3)));
+                    }
+                    if (!(response.getInput(4) == null) && Objects.requireNonNull(response.getInput(4)).length() > 0) {
+                        business.TrustedRank = Integer.parseInt(Objects.requireNonNull(response.getInput(4)));
+                    }
+
+                    business.SaveData();
+
+                    if (!(response.getInput(0) == null) && Objects.requireNonNull(response.getInput(0)).length() > 0) {
+                        String OldName = business.BusinessName;
+                        String NewName = response.getInput(0);
+                        if (!api.RenamedBusinessSuccessfully(NewName, OldName)){
+                            player.sendMessage(PayRollAPI.getLanguage("BusinessNameAlrRegistered"));
+                        }
+                    }
+                } else if (employee.Rank >= business.TrustedRank && !Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())) {
+                    if (!(response.getInput(0) == null) && Objects.requireNonNull(response.getInput(0)).length() > 0) {
+                        business.BusinessDesc = response.getInput(0);
+                    }
+                    if (!(response.getInput(1) == null) && Objects.requireNonNull(response.getInput(1)).length() > 0) {
+                        business.MaxRank = Integer.parseInt(Objects.requireNonNull(response.getInput(1)));
+                    }
+                    if (!(response.getInput(2) == null) && Objects.requireNonNull(response.getInput(2)).length() > 0) {
+                        business.MinRank = Integer.parseInt(Objects.requireNonNull(response.getInput(2)));
+                    }
+
+                    business.SaveData();
                 }
 
-                if (!(response.getInput(2) == null) && response.getInput(2).length() > 0){
-                    business.BusinessDesc = response.getInput(2);
-                }
 
-                if (!(response.getInput(3) == null) && response.getInput(3).length() > 0){
-                    business.MaxRank = Integer.parseInt(response.getInput(3));
-                }
-                if (!(response.getInput(4) == null) && response.getInput(4).length() > 0 ){
-                    business.MinRank = Integer.parseInt(response.getInput(4));
-                }
-                if (!(response.getInput(5) == null) && response.getInput(5).length() > 0){
-                    business.TrustedRank = Integer.parseInt(response.getInput(5));
-                }
+                player.sendMessage(PayRollAPI.getLanguage("SuccessfullyUpdated"));
+
+                Options options = new Options();
+                options.initialize(player, business);
+            }catch(Exception ignored){PayRollAPI.plugin.getLogger().warning(ignored.getMessage());}
             }
-            else if (employee.Rank >= business.TrustedRank && !Objects.equals(employee.playerUUID.toString(), business.Owner.getUniqueId().toString())){
-                if (!(response.getInput(1) == null) && response.getInput(1).length() > 0){
-                    business.BusinessDesc = response.getInput(1);
-                }
-                if (!(response.getInput(2) == null) && response.getInput(2).length() > 0){
-                    business.MaxRank = Integer.parseInt(response.getInput(2));
-                }
-                if (!(response.getInput(3) == null) && response.getInput(3).length() > 0 ){
-                    business.MinRank = Integer.parseInt(response.getInput(3));
-                }
-            }
-
-            business.SaveData();
-            player.getPlayer().sendMessage(PayRollAPI.getLanguage("SuccessfullyUpdated"));
-
-            Options options = new Options();
-            options.initialize(player, business);
         });
-
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), Form);
     }
 }

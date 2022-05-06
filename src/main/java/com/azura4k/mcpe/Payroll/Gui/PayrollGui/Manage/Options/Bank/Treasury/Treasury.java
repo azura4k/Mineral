@@ -25,6 +25,8 @@ public class Treasury {
         form.button(PayRollAPI.getLanguage("BankOptionsFormWithdrawButton"));
         form.button(PayRollAPI.getLanguage("BackButton"));
         form.responseHandler((form, reponseData)->{
+            try{
+            if (!form.isClosed(reponseData)){
             SimpleFormResponse response = form.parseResponse(reponseData);
             if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("BankOptionsFormDepositButton"))){
                 Deposit Customform = new Deposit();
@@ -37,6 +39,9 @@ public class Treasury {
             if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("BackButton"))){
                 Options options = new Options();
                 options.initialize(player, Business);
+            }
+            }}catch (Exception ignored){
+                PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
             }
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);

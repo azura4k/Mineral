@@ -29,14 +29,19 @@ public class SelectMenu {
 
         form.button(PayRollAPI.getLanguage("CreateBusinessButton"));
         form.responseHandler((form, responseData) -> {
-            SimpleFormResponse response = form.parseResponse(responseData);
-            if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("CreateBusinessButton"))){
-                CreateBusiness CreateBusiness = new CreateBusiness();
-                CreateBusiness.initialize(player);
-            }
-            else if (!response.getClickedButton().getText().equals(PayRollAPI.getLanguage("CreateBusinessButton"))){
-                Options options = new Options();
-                options.initialize(player, api.LoadBusiness(response.getClickedButton().getText()));
+            if (!form.isClosed(responseData)){
+                try {
+                    SimpleFormResponse response = form.parseResponse(responseData);
+                    if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("CreateBusinessButton"))) {
+                        CreateBusiness CreateBusiness = new CreateBusiness();
+                        CreateBusiness.initialize(player);
+                    } else if (!response.getClickedButton().getText().equals(PayRollAPI.getLanguage("CreateBusinessButton"))) {
+                        Options options = new Options();
+                        options.initialize(player, api.LoadBusiness(response.getClickedButton().getText()));
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
 

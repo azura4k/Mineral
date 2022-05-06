@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,22 +33,22 @@ public class PayrollBase extends JavaPlugin {
     public void onLoad() {
         super.onLoad();
         getLogger().info("Starting Up");
-        this.getCommand("manage").setExecutor(new ManageCmd());
-        this.getCommand("timesheet").setExecutor(new TimesheetCmd());
-        this.getCommand("joboffer").setExecutor(new JobOfferCmd());
-        this.getCommand("payto").setExecutor(new PayToCmd());
-
     }
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
         super.onEnable();
+        saveDefaultConfig();
         this.getLogger().info("Payroll has Loaded");
         PayRollAPI.Initialize(this);
         api = new PayRollAPI();
-        this.getServer().getPluginManager().registerEvents(new AutoClockOut(), this);
 
+
+        this.getServer().getPluginManager().registerEvents(new AutoClockOut(), this);
+        this.getCommand("manage").setExecutor(new ManageCmd());
+        this.getCommand("timesheet").setExecutor(new TimesheetCmd());
+        this.getCommand("joboffer").setExecutor(new JobOfferCmd());
+        this.getCommand("payto").setExecutor(new PayToCmd());
 
 
 
@@ -66,6 +67,11 @@ public class PayrollBase extends JavaPlugin {
         super.onDisable();
         timer.cancel();
         this.getLogger().warning("Payroll has been Disabled");
+        try {
+            PayRollAPI.Conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
 

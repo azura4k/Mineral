@@ -1,26 +1,30 @@
   name: Payroll
   main: com.azura4k.mcpe.Payroll.PayrollBase
-  version: 1.1.1
-  api: 1.0.0
+  version: 2.0.0
+  api-version: 1.18
   description: A nice plugin for economy servers where players can start business and host jobs.
   author: Azura4k
-  depend:
-    - Vault
-    - Floodgate
+  softdepend: [Floodgate, Vault]
+  website: azura4k.com
+  load: POSTWORLD
   commands:
       manage:
+          name: manage
           description: Open GUI to create, delete, or manage a business.
           usage: /manage
           permission: Payroll.cmd
       timesheet:
+          name: timesheet
           description:  Open GUI to clock in, clock out of work.
           usage: /timesheet
           permission: Payroll.cmd
       joboffer:
+          name: joboffer
           description: Open GUI to accept or reject job offers.
           usage: /joboffer
           permission: Payroll.cmd
       payto:
+          name: payto
           description: Open GUI pay companies.
           usage: /payto
           permission: Payroll.cmd

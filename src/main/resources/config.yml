@@ -14,6 +14,12 @@ TaxPercent : 0.0
 #For every millisecond to check to see if a player needs force clockout
 ForceClockOutInMilliseconds: 5000
 
+#Pay an employee when they quite, default is true
+PayOutOnQuit: true
+
+#Pay an employee when they are fired, default is true
+PayOutOnFire: true
+
 
 #Here is all the Language Stuff
 Language:
@@ -39,7 +45,7 @@ Language:
   ManageBusinessInfoFormUUID: 'Your Business UID: '
 
   #Note, Balance will be at the end
-  ManageBusinessInfoFormBalance: 'Current Business Bank Balance is'
+  ManageBusinessInfoFormBalance: 'Current Business Bank Balance is: '
   ManageBusinessInfoFormTrustedRankBelowOwner: 'Current Trusted Rank: '
   ManageBusinessInfoFormNameBelowOwner: 'Business Name: '
 
@@ -104,10 +110,18 @@ Language:
   PayedToBusiness: 'You have payed: '
   PayedToBusinessPt2: ' to: '
   ReceiptAuthor: 'Server'
-  ReceiptBusinessHeader: 'Payed to Business Named \n -------------------- \n '
-  ReceiptAmountHeader: 'In the Amount of \n -------------------- \n '
-  ReceiptEmployeeHeader: 'With Representative \n -------------------- \n'
-  ReceiptReasonHeader: 'For Reason of \n -------------------- \n '
+  ReceiptBusinessHeader: 'Payed to Business Named <br> -------------------- '
+  ReceiptAmountHeader: 'In the Amount of <br> -------------------- '
+  ReceiptEmployeeHeader: 'With Representative <br> -------------------- '
+  ReceiptReasonHeader: 'For Reason of <br> --------------------  '
+
+  PayStubTitle: 'Pay Stub From: '
+  PayStubPayee: 'To be payed to order of: of <br> -------------------- '
+  PayStubAmount: 'For the amount of: <br> --------------------  '
+  PayStubDate: 'On the date of: of <br> --------------------  '
+  PayStubPayer: 'By the company of: <br> --------------------  '
+  PayStubTaxSubtraction: 'With Server tax of: <br> -------------------- '
+  PayStubTotal: 'To a total payment of: <br> --------------------  '
 
   #PayToForm
   PayToFormTitle: 'Pay a business'

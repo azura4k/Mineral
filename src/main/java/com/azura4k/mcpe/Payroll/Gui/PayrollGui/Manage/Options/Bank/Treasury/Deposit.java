@@ -9,26 +9,33 @@ import org.geysermc.cumulus.CustomForm;
 import org.geysermc.cumulus.response.CustomFormResponse;
 import org.geysermc.floodgate.api.FloodgateApi;
 
+import java.util.Objects;
+
 
 public class Deposit {
 
-    PayRollAPI api = new PayRollAPI();
     CustomForm.Builder form = CustomForm.builder();
     public void initialize(Player player, Business business, Employee employee){
         form.title(PayRollAPI.getLanguage("DepositFormTitle"));
         form.label(PayRollAPI.getLanguage("DepositFormCurrentBalance") + business.Balance);
         form.input(PayRollAPI.getLanguage("DepositFormEnterAmount"));
-        form.responseHandler((form, responseData) -> {
-            CustomFormResponse response = form.parseResponse(responseData);
-            Double Amount = Double.valueOf(response.getInput(1));
-            if (business.Deposit(employee, Amount)){
-                player.sendMessage(PayRollAPI.getLanguage("DepositFormSuccesful") + Amount);
-                Treasury customForm = new Treasury();
-                customForm.initialize(player, business, employee);
-            }
-            else{
-                player.sendMessage(PayRollAPI.getLanguage("OverDraftRisk"));
-            }
+        form.responseHandler((Form, responseData) -> {
+
+                try {
+
+                    CustomFormResponse response = Form.parseResponse(responseData);
+                    if (response.isCorrect()){
+                        double Amount = Double.parseDouble(Objects.requireNonNull(response.getInput(1)));
+                        if (business.Deposit(employee, Amount)) {
+                            player.sendMessage(PayRollAPI.getLanguage("DepositFormSuccesful") + Amount);
+                            Treasury customForm = new Treasury();
+                            customForm.initialize(player, business, employee);
+                        } else {
+                            player.sendMessage(PayRollAPI.getLanguage("OverDraftRisk"));
+                        }}
+                } catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
         });
        FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }

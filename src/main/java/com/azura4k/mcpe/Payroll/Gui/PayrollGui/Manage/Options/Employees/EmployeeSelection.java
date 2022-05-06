@@ -35,6 +35,8 @@ public class EmployeeSelection {
         form.button(PayRollAPI.getLanguage("BackButton"));
 
         form.responseHandler((modal, reponseData) -> {
+            if (!modal.isClosed(reponseData)){
+                try{
             SimpleFormResponse response = modal.parseResponse(reponseData);
             if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("EmployeeSelectionFormSearchButton"))) {
                 EmployeeSelectionByName customForm = new EmployeeSelectionByName();
@@ -44,10 +46,14 @@ public class EmployeeSelection {
                 Options customForm = new Options();
                 customForm.initialize(player, Business);
             }
-            else if (response.isCorrect()){
+            else if (response.isCorrect()) {
                 EmployeeSelectionOptions customForm = new EmployeeSelectionOptions();
                 employee = api.LoadEmployee(Business, response.getClickedButton().getText());
                 customForm.initialize(player, Business, employee);
+            }
+            }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);

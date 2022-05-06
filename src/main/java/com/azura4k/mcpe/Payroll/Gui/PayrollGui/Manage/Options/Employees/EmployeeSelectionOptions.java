@@ -26,14 +26,20 @@ public class EmployeeSelectionOptions {
             form.button(PayRollAPI.getLanguage("EmployeeSelectionFormTerm"));
         }
         form.responseHandler((Form, reponseData)->{
-            SimpleFormResponse response = Form.parseResponse(reponseData);
-            if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("EmployeeSelectionFormManage"))){
-                EmployeeInfoPage form = new EmployeeInfoPage();
-                form.initialize(player,Business, Employee);
-            }
-            if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("EmployeeSelectionFormTerm"))){
-                FireEmployee form = new FireEmployee();
-                form.initialize(player, Business, Employee);
+            if (!Form.isClosed(reponseData)) {
+                try {
+                    SimpleFormResponse response = Form.parseResponse(reponseData);
+                    if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("EmployeeSelectionFormManage"))) {
+                        EmployeeInfoPage form = new EmployeeInfoPage();
+                        form.initialize(player, Business, Employee);
+                    }
+                    if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("EmployeeSelectionFormTerm"))) {
+                        FireEmployee form = new FireEmployee();
+                        form.initialize(player, Business, Employee);
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);

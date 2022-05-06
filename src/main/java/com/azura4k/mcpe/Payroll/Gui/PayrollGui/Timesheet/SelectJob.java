@@ -26,10 +26,16 @@ public class SelectJob {
         }
 
         form.responseHandler((form, reponseData) -> {
-            SimpleFormResponse response = form.parseResponse(reponseData);
-            if (response.isCorrect()){
-                ClockInClockOut clockForm = new ClockInClockOut();
-                clockForm.initialize(player, api.LoadBusiness(response.getClickedButton().getText()), api.LoadEmployee(api.LoadBusiness(response.getClickedButton().getText()), player.getName()));
+            if (!form.isClosed(reponseData)) {
+                try {
+                    SimpleFormResponse response = form.parseResponse(reponseData);
+                    if (response.isCorrect()) {
+                        ClockInClockOut clockForm = new ClockInClockOut();
+                        clockForm.initialize(player, api.LoadBusiness(response.getClickedButton().getText()), api.LoadEmployee(api.LoadBusiness(response.getClickedButton().getText()), player.getName()));
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);

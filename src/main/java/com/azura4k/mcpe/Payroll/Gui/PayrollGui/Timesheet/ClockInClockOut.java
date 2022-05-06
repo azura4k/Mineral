@@ -29,15 +29,19 @@ public class ClockInClockOut {
         form.button(PayRollAPI.getLanguage("ClouckOutButton"));
         form.button(PayRollAPI.getLanguage("PayoutOutButton"));
         form.responseHandler((form, responseData) -> {
-            SimpleFormResponse response = form.parseResponse(responseData);
-            if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("ClockInButton"))){
-                api.RegisterOnClock(player, Employee);
-            }
-            else if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("ClouckOutButton"))){
-                api.RegisterOffClock(Employee);
-            }
-            else if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("ClouckOutButton"))){
-                api.PayEmployeeMinutelyRate(Employee);
+            if (!form.isClosed(responseData)) {
+                try {
+                    SimpleFormResponse response = form.parseResponse(responseData);
+                    if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("ClockInButton"))) {
+                        api.RegisterOnClock(player, Employee);
+                    } else if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("ClouckOutButton"))) {
+                        api.RegisterOffClock(Employee);
+                    } else if (response.getClickedButton().getText().equals(PayRollAPI.getLanguage("PayoutOutButton"))) {
+                        api.PayEmployeeMinutelyRate(Employee);
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);

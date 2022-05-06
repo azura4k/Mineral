@@ -21,16 +21,21 @@ public class FireEmployee {
         form.button1(PayRollAPI.getLanguage("EmployeeTerminationModalYesButton"));
         form.button2(PayRollAPI.getLanguage("EmployeeTerminationModalNoButton"));
         form.responseHandler( (form, data) ->{
-            ModalFormResponse result = form.parseResponse(data);
-            if (result.getResult()){
-                api.FireEmployee(employee);
-                EmployeeSelection employeeSelection = new EmployeeSelection();
-                employeeSelection.Initialize(player, business);
-            }
-            else if(!result.getResult()){
-                player.sendMessage(PayRollAPI.getLanguage("EmployeeTerminationAbortionMessage"));
-                EmployeeSelection employeeSelection = new EmployeeSelection();
-                employeeSelection.Initialize(player, business);
+            if (!form.isClosed(data)) {
+                try {
+                    ModalFormResponse result = form.parseResponse(data);
+                    if (result.getResult()) {
+                        api.FireEmployee(employee);
+                        EmployeeSelection employeeSelection = new EmployeeSelection();
+                        employeeSelection.Initialize(player, business);
+                    } else if (!result.getResult()) {
+                        player.sendMessage(PayRollAPI.getLanguage("EmployeeTerminationAbortionMessage"));
+                        EmployeeSelection employeeSelection = new EmployeeSelection();
+                        employeeSelection.Initialize(player, business);
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         }
         );

@@ -17,27 +17,27 @@ public class EmployeeSelectionByName {
         form.title(PayRollAPI.getLanguage("EmployeeSearchFormTitle"));
         form.input(PayRollAPI.getLanguage("EmployeeSearchFormInstructions"));
         form.responseHandler((form, reponseData)->{
+            if (!form.isClosed(reponseData)){
+                try{
             CustomFormResponse response = form.parseResponse(reponseData);
 
-            if (response.getInput(1) == null){
+            if (response.getInput(0) == null){
                 player.sendMessage(PayRollAPI.getLanguage("NoValueDetected"));
             }
             else {
-                String Query = response.getInput(1);
-                Employee employee =  api.LoadEmployee(business, Query);
+                String Query = response.getInput(0);
+                Employee employee = api.LoadEmployee(business, Query);
                 if (!(employee == null)) {
                     EmployeeSelectionOptions customForm = new EmployeeSelectionOptions();
                     customForm.initialize(player, business, employee);
-                }
-                else{
+                } else {
                     player.sendMessage(PayRollAPI.getLanguage("NoEmployeeFound"));
                     EmployeeSelection form2 = new EmployeeSelection();
                     form2.Initialize(player, business);
-                }
-
-            }
-        });
-        FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
+                }}
+            }catch (Exception ignored){}
+        }});
+            FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }
 
 }

@@ -21,16 +21,24 @@ public class QuitJob {
 
         QuitJob.content(PayRollAPI.getLanguage("QuitPositionFormContent") + employee.EmployerName);
         QuitJob.button1(PayRollAPI.getLanguage("QuitPositionFormYes"));
-        QuitJob.button2("QuitPositionFormNo");
+        QuitJob.button2((PayRollAPI.getLanguage("QuitPositionFormNo")));
 
         QuitJob.responseHandler((form, result) -> {
-            ModalFormResponse response = form.parseResponse(result);
-            if (response.getResult()){
-                api.FireEmployee(employee);
-            }
-            else if (!response.getResult()){
-                Options options = new Options();
-                options.initialize(player,business);
+            if (!form.isClosed(result)) {
+                try {
+                    ModalFormResponse response = form.parseResponse(result);
+                    if (response.getResult()) {
+                        if (PayRollAPI.PluginConfig.getBoolean("PayOutOnQuit")){
+                        api.PayEmployeeMinutelyRate(employee);
+                        }
+                        api.FireEmployee(employee);
+                    } else if (!response.getResult()) {
+                        Options options = new Options();
+                        options.initialize(player, business);
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
 

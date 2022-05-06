@@ -29,13 +29,18 @@ public class AcceptOrDenyJob {
         );
 
         form.responseHandler( (form, result) -> {
-            ModalFormResponse response = form.parseResponse(result);
-            if (response.getResult()){
-                api.AcceptPosition(player, businessName);
-            }else if (!response.getResult()){
-                api.DeleteJobOffer(player, businessName);
+            if (!form.isClosed(result)) {
+                try {
+                    ModalFormResponse response = form.parseResponse(result);
+                    if (response.getResult()) {
+                        api.AcceptPosition(player, businessName);
+                    } else if (!response.getResult()) {
+                        api.DeleteJobOffer(player, businessName);
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
-
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }

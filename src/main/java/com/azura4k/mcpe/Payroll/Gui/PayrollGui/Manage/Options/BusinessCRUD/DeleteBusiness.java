@@ -24,6 +24,9 @@ public class DeleteBusiness {
 
         form.responseHandler((form, result) -> {
             ModalFormResponse response = form.parseResponse(result);
+            if (!form.isClosed(result)){
+                try{
+
             if (response.getResult()){
                 api.DeleteBusiness(business, player);
                 SelectMenu selectMenu = new SelectMenu();
@@ -33,7 +36,8 @@ public class DeleteBusiness {
                 player.sendMessage(PayRollAPI.getLanguage("DeleteBusinessFormAverted"));
                 Options menu = new Options();
                 menu.initialize(player, business);
-            }});
+            }
+            }catch(Exception ignored){}}});
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);
     }
 }

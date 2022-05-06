@@ -24,19 +24,24 @@ public class CreateBusiness {
         form.label(PayRollAPI.getLanguage("CreateBusinessFormStartupCost") + StartupCost);
         form.responseHandler((form, reponseData)->{
             CustomFormResponse response = form.parseResponse(reponseData);
-            OfflinePlayer player2 = PayRollAPI.plugin.getServer().getOfflinePlayer(player.getUniqueId());
-            if (PayRollAPI.getEconomy().getBalance(player2) >= StartupCost){
-                PayRollAPI.getEconomy().withdrawPlayer(player2, StartupCost);
-                if (api.CreateBusiness(response.getInput(1), response.getInput(2), player)){
-                    SelectMenu customForm = new SelectMenu();
-                    customForm.initialize(player);
-                }
-                else {
-                    player.sendMessage(PayRollAPI.getLanguage("BusinessNameAlrRegistered"));
+            if (!form.isClosed(reponseData)) {
+                try {
+                OfflinePlayer player2 = PayRollAPI.plugin.getServer().getOfflinePlayer(player.getUniqueId());
+                if (PayRollAPI.getEconomy().getBalance(player2) >= StartupCost) {
+                    PayRollAPI.getEconomy().withdrawPlayer(player2, StartupCost);
+                    if (api.CreateBusiness(response.getInput(0), response.getInput(1), player)) {
+                        SelectMenu customForm = new SelectMenu();
+                        customForm.initialize(player);
+                    } else {
+                        player.sendMessage(PayRollAPI.getLanguage("BusinessNameAlrRegistered"));
+                    }
+                } else {
+                    player.sendMessage(PayRollAPI.getLanguage("OverDraftRisk d"));
                 }
             }
-            else {
-                player.sendMessage(PayRollAPI.getLanguage("OverDraftRisk d"));
+            catch (Exception ignored){
+                PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+            }
             }
         });
         FloodgateApi.getInstance().sendForm(player.getUniqueId(), form);

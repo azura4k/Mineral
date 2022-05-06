@@ -61,38 +61,38 @@ public class Options {
         }
 
         Options.responseHandler((form, responseData) -> {
-            SimpleFormResponse response = form.parseResponse(responseData);
-            if (response.getClickedButton().getText().equals(business_info)){
-                BusinessInfo customForm = new BusinessInfo();
-                customForm.initialize(player, business);
-            }
-            else if (response.getClickedButton().getText().equals(treasury)){
-                Treasury customForm = new Treasury();
-                customForm.initialize(player, business, api.LoadEmployee(business, player.getName()));
-            }
-            else if (response.getClickedButton().getText().equals(employee_info)){
-                EmployeeSelection customForm = new EmployeeSelection();
-                customForm.Initialize(player, business);
-            }
-            else if (response.getClickedButton().getText().equals(hire_employee)){
-                HireEmployee customForm = new HireEmployee();
-                customForm.initalize(player, business);
-            }
-            else if (response.getClickedButton().getText().equals(transfer_ownership)){
-                TransferOwnership customForm = new TransferOwnership();
-                customForm.Initialize(player, business);
-            }
-            else if (response.getClickedButton().getText().equals(quit_job)){
-                QuitJob customForm = new QuitJob();
-                customForm.Initialize(player, business, api.LoadEmployee(business, player.getName()));
-            }
-            else if (response.getClickedButton().getText().equals(delete_business)){
-                DeleteBusiness customForm = new DeleteBusiness();
-                customForm.initialize(player, business);
-            }
-            else if (response.getClickedButton().getText().equals(back_button)){
-                SelectMenu menu = new SelectMenu();
-                menu.initialize(player);
+            if (!form.isClosed(responseData)) {
+                try {
+                    SimpleFormResponse response = form.parseResponse(responseData);
+
+                    if (response.getClickedButton().getText().equals(business_info)) {
+                        BusinessInfo customForm = new BusinessInfo();
+                        customForm.initialize(player, business);
+                    } else if (response.getClickedButton().getText().equals(treasury)) {
+                        Treasury customForm = new Treasury();
+                        customForm.initialize(player, business, api.LoadEmployee(business, player.getName()));
+                    } else if (response.getClickedButton().getText().equals(employee_info)) {
+                        EmployeeSelection customForm = new EmployeeSelection();
+                        customForm.Initialize(player, business);
+                    } else if (response.getClickedButton().getText().equals(hire_employee)) {
+                        HireEmployee customForm = new HireEmployee();
+                        customForm.initalize(player, business);
+                    } else if (response.getClickedButton().getText().equals(transfer_ownership)) {
+                        TransferOwnership customForm = new TransferOwnership();
+                        customForm.Initialize(player, business);
+                    } else if (response.getClickedButton().getText().equals(quit_job)) {
+                        QuitJob customForm = new QuitJob();
+                        customForm.Initialize(player, business, api.LoadEmployee(business, player.getName()));
+                    } else if (response.getClickedButton().getText().equals(delete_business)) {
+                        DeleteBusiness customForm = new DeleteBusiness();
+                        customForm.initialize(player, business);
+                    } else if (response.getClickedButton().getText().equals(back_button)) {
+                        SelectMenu menu = new SelectMenu();
+                        menu.initialize(player);
+                    }
+                }catch (Exception ignored){
+                    PayRollAPI.plugin.getLogger().warning(ignored.getMessage());
+                }
             }
         });
 

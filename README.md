@@ -1,5 +1,5 @@
 # Payroll
-A nukkit plugin for economy servers that adds paying players and running business without being present way smoother.
+A Spigot Floodgate plugin for economy servers that adds paying players and running business without being present way smoother.
 Heres some commands <br>
 
 ### Requires LlamaEconomy and FormConstructor
